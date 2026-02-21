@@ -51,21 +51,15 @@ jobs:
   engine-build:
     name: Engine Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: engine
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: "engine -> target"
-      - run: cargo build --release
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
           context: engine
           push: false
+          cache-from: type=gha,scope=engine
+          cache-to: type=gha,scope=engine,mode=max
 
   server-check:
     name: Server Check
@@ -82,16 +76,12 @@ jobs:
   server-build:
     name: Server Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - run: bun build --compile --minify-whitespace --minify-syntax --outfile server src/index.ts
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
           context: server
           push: false
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
