@@ -1,7 +1,7 @@
+use axum::Json;
 use axum::body::Body;
 use axum::http::{StatusCode, header};
 use axum::response::Response;
-use axum::Json;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 
@@ -9,9 +9,7 @@ use crate::graph::GraphParams;
 use crate::state::State;
 use crate::transition::Transition;
 
-pub async fn get_graph(
-    Json(params): Json<GraphParams>,
-) -> Result<Response, StatusCode> {
+pub async fn get_graph(Json(params): Json<GraphParams>) -> Result<Response, StatusCode> {
     params.validate()?;
 
     let (tx, rx) = mpsc::channel::<Result<String, std::io::Error>>(32);
