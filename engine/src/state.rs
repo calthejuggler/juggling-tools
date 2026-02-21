@@ -32,7 +32,7 @@ impl State {
             .collect()
     }
 
-    pub fn to_binary_string(&self, max_height: u8) -> String {
+    pub fn to_binary_string(self, max_height: u8) -> String {
         (0..max_height)
             .rev()
             .map(|i| if self.ball_at(i) { '1' } else { '0' })

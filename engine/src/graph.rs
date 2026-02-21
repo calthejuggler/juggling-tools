@@ -62,7 +62,7 @@ impl Graph {
         };
 
         json!({
-            "nodes": self.nodes.iter().map(|s| state_value(s)).collect::<Vec<_>>(),
+            "nodes": self.nodes.iter().map(state_value).collect::<Vec<_>>(),
             "edges": self.edges.iter().map(|e| json!({
                 "from": state_value(&e.from()),
                 "to": state_value(&e.to()),

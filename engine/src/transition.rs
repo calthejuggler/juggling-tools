@@ -51,7 +51,7 @@ impl Transition {
             for bit_pos in 0..max_height {
                 if (shifted >> bit_pos) & 1 == 0 {
                     let new_bits = shifted | (1 << bit_pos);
-                    let throw_height = (bit_pos + 1) as u8;
+                    let throw_height = bit_pos + 1;
 
                     transitions.push(Transition {
                         from: state,
