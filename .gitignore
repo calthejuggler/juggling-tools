@@ -182,3 +182,30 @@ graph.html
 /engine/debug
 
 **/*.rs.bk
+
+# Elysia
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+/server/node_modules
+/server/.pnp
+/server/.pnp.js
+/server/coverage
+/server/.next/
+/server/out/
+/server/build
+/server/.DS_Store
+/server/*.pem
+/server/npm-debug.log*
+/server/yarn-debug.log*
+/server/yarn-error.log*
+/server/.env.local
+/server/.env.development.local
+/server/.env.test.local
+/server/.env.production.local
+/server/.vercel
+/server/**/*.trace
+/server/**/*.zip
+/server/**/*.tar.gz
+/server/**/*.tgz
+/server/**/*.log
+/server/package-lock.json
+/server/**/*.bun

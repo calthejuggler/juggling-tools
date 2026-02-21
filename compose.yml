@@ -4,6 +4,11 @@ services:
     build: ./engine
     ports:
       - "8000:8000"
+  server:
+    container_name: server
+    build: ./server
+    ports:
+      - "3000:3000"
   db:
     image: postgres:17
     container_name: db
