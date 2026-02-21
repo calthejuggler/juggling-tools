@@ -60,7 +60,9 @@ function generateGraph(numBalls: number, maxHeight: number): Graph {
 function printGraph(graph: Graph): void {
   for (const state of graph.states) {
     const outgoing = graph.edges.filter((e) => e.from === state);
-    const edgeStrs = outgoing.map((e) => `${e.to} (${e.throwHeight})`).join(", ");
+    const edgeStrs = outgoing
+      .map((e) => `${e.to} (${e.throwHeight})`)
+      .join(", ");
     console.log(`${state} -> ${edgeStrs}`);
   }
 }
@@ -159,19 +161,23 @@ function openInBrowser(filePath: string) {
   Bun.spawn([cmd, filePath]);
 }
 
-const numBalls = parseInt(process.argv[2]);
-const maxHeight = parseInt(process.argv[3]);
+const main = async () => {
+  const numBalls = parseInt(process.argv[2]);
+  const maxHeight = parseInt(process.argv[3]);
 
-if (isNaN(numBalls) || isNaN(maxHeight)) {
-  console.error("Usage: bun run index.ts <numBalls> <maxHeight>");
-  process.exit(1);
-}
+  if (isNaN(numBalls) || isNaN(maxHeight)) {
+    console.error("Usage: bun run index.ts <numBalls> <maxHeight>");
+    process.exit(1);
+  }
 
-const graph = generateGraph(numBalls, maxHeight);
-printGraph(graph);
+  const graph = generateGraph(numBalls, maxHeight);
+  printGraph(graph);
 
-const groundState = "0".repeat(maxHeight - numBalls) + "x".repeat(numBalls);
-const html = generateHtml(graph, groundState);
-const outputPath = `${import.meta.dir}/graph.html`;
-await Bun.write(outputPath, html);
-openInBrowser(outputPath);
+  const groundState = "0".repeat(maxHeight - numBalls) + "x".repeat(numBalls);
+  const html = generateHtml(graph, groundState);
+  const outputPath = `${import.meta.dir}/graph.html`;
+  await Bun.write(outputPath, html);
+  openInBrowser(outputPath);
+};
+
+await main();

@@ -2,6 +2,9 @@
   "name": "jgraph",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run index.ts 3 5"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -9,3 +12,4 @@
     "typescript": "^5.0.0"
   }
 }
+
