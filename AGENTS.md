@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Project Overview
 
-jgraph is a full-stack application for querying and visualizing graph data. It's a monorepo with three services:
+Juggling Tools is a full-stack application for querying and visualizing graph data. It's a monorepo with three services:
 
 - **web/** — React frontend (Vite + TanStack Router + Tailwind CSS 4)
 - **server/** — Elysia.js backend API (Bun runtime)

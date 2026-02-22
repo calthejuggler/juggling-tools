@@ -14,12 +14,12 @@ export function GraphsPage() {
   const navigate = Route.useNavigate();
 
   const [reversed, setReversed] = useState(
-    () => localStorage.getItem("jgraph-reversed") === "true",
+    () => localStorage.getItem("juggling-tools-reversed") === "true",
   );
 
   const handleReversedChange = useCallback((checked: boolean) => {
     setReversed(checked);
-    localStorage.setItem("jgraph-reversed", String(checked));
+    localStorage.setItem("juggling-tools-reversed", String(checked));
   }, []);
 
   const submitted: GraphsValues = { num_props, max_height };

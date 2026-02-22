@@ -117,7 +117,7 @@ const procs: Subprocess[] = [];
 async function main() {
   await ensureDeps();
   await startInfra();
-  await Promise.all([waitForHealthy("jgraph-db"), waitForHealthy("jgraph-redis")]);
+  await Promise.all([waitForHealthy("juggling-tools-db"), waitForHealthy("juggling-tools-redis")]);
 
   log("infra", "Infrastructure ready. Starting apps...\n");
 

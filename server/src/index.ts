@@ -25,7 +25,7 @@ const main = async () => {
       openapi({
         documentation: {
           info: {
-            title: "jgraph API",
+            title: "Juggling Tools API",
             version: packageJson.version,
             description:
               "API for computing and visualizing juggling siteswap state graphs. " +

@@ -25,7 +25,7 @@ function AuthedLayout() {
     <div className="flex h-screen flex-col">
       <header className="border-border bg-card border-b">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-semibold">jgraph</h1>
+          <h1 className="text-lg font-semibold">Juggling Tools</h1>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={toggleTheme}>
               {theme === "dark" ? "Light" : "Dark"}
