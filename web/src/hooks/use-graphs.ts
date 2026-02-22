@@ -18,6 +18,14 @@ export function useGraphs(params: GraphsValues | null) {
         credentials: "include",
       });
 
+      if (res.status === 429) {
+        const retryAfter = res.headers.get("Retry-After");
+        const seconds = retryAfter ? parseInt(retryAfter, 10) : 60;
+        throw new Error(
+          `Too many requests. Please try again in ${seconds} seconds.`,
+        );
+      }
+
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || `Request failed with status ${res.status}`);

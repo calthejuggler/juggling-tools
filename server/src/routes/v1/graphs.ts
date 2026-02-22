@@ -1,5 +1,6 @@
 import { Elysia, t } from "elysia";
 import type { WideEvent } from "../../lib/logging";
+import { graphRateLimit } from "../../lib/rate-limit";
 
 const ENGINE_URL = Bun.env.ENGINE_URL ?? "http://localhost:8000";
 const ENGINE_API_KEY = Bun.env.ENGINE_API_KEY ?? "";
@@ -11,6 +12,7 @@ const graphQuerySchema = t.Object({
 });
 
 export const graphsRoute = new Elysia()
+  .use(graphRateLimit)
   .get(
     "/graphs",
     async (ctx) => {
