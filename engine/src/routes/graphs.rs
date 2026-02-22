@@ -2,26 +2,37 @@ use axum::body::Body;
 use axum::extract::{Query, State as AxumState};
 use axum::http::{StatusCode, header};
 use axum::response::Response;
+use axum::Extension;
 use bytes::Bytes;
 
 use crate::cache::memory::fits_in_memory;
 use crate::cache::redis::fits_in_redis;
 use crate::graph::GraphParams;
+use crate::logging::WideEventHandle;
 use crate::state::State;
 use crate::transition::Transition;
 
 pub async fn get_graph_query(
     AxumState(app): AxumState<crate::AppState>,
     Query(params): Query<GraphParams>,
+    wide_event: Option<Extension<WideEventHandle>>,
 ) -> Result<Response, StatusCode> {
-    build_graph_response(app, params).await
+    build_graph_response(app, params, wide_event.map(|e| e.0)).await
 }
 
 async fn build_graph_response(
     app: crate::AppState,
     params: GraphParams,
+    wide_event: Option<WideEventHandle>,
 ) -> Result<Response, StatusCode> {
     params.validate()?;
+
+    if let Some(ref we) = wide_event {
+        let mut we = we.lock().unwrap();
+        we.num_balls = Some(params.num_balls);
+        we.max_height = Some(params.max_height);
+        we.compact = Some(params.compact);
+    }
 
     let key = format!(
         "{}-{}-{}",
@@ -29,6 +40,11 @@ async fn build_graph_response(
     );
 
     if let Some(data) = app.memory_cache.get(&key).await {
+        if let Some(ref we) = wide_event {
+            let mut we = we.lock().unwrap();
+            we.cache_hit_tier = Some("memory");
+            we.response_bytes = Some(data.len());
+        }
         return ok_response(Body::from(data));
     }
 
@@ -39,6 +55,11 @@ async fn build_graph_response(
             app.memory_cache
                 .insert(key.clone(), Bytes::from(data.clone()))
                 .await;
+        }
+        if let Some(ref we) = wide_event {
+            let mut we = we.lock().unwrap();
+            we.cache_hit_tier = Some("redis");
+            we.response_bytes = Some(data.len());
         }
         return ok_response(Body::from(data));
     }
@@ -53,6 +74,11 @@ async fn build_graph_response(
             app.memory_cache
                 .insert(key.clone(), Bytes::from(data.clone()))
                 .await;
+        }
+        if let Some(ref we) = wide_event {
+            let mut we = we.lock().unwrap();
+            we.cache_hit_tier = Some("file");
+            we.response_bytes = Some(data.len());
         }
         return ok_response(Body::from(data));
     }
@@ -71,6 +97,12 @@ async fn build_graph_response(
         app.memory_cache
             .insert(key, Bytes::from(data.clone()))
             .await;
+    }
+
+    if let Some(ref we) = wide_event {
+        let mut we = we.lock().unwrap();
+        we.cache_hit_tier = Some("none");
+        we.response_bytes = Some(data.len());
     }
 
     ok_response(Body::from(data))

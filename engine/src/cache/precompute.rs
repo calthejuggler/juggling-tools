@@ -70,8 +70,11 @@ pub async fn precompute(
         }
     }
 
-    println!(
-        "Pre-computation done: {} computed, {} already cached, {} skipped (too large)",
-        computed, cached, skipped
+    tracing::info!(
+        event = "precompute_done",
+        computed,
+        cached,
+        skipped,
+        "pre-computation done"
     );
 }

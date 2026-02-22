@@ -1,5 +1,6 @@
 mod cache;
 mod graph;
+mod logging;
 mod routes;
 mod state;
 mod transition;
@@ -11,6 +12,7 @@ use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::Response;
 use bytes::Bytes;
+use tracing_subscriber::EnvFilter;
 
 use cache::file::FileCache;
 use cache::redis::RedisCache;
@@ -32,6 +34,11 @@ async fn require_api_key(req: Request, next: Next) -> Result<Response, StatusCod
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .json()
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+        .init();
+
     let cache_dir = std::env::var("CACHE_DIR").unwrap_or_else(|_| "/app/cache".to_string());
     let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://redis:6379".to_string());
 
@@ -40,11 +47,11 @@ async fn main() {
 
     let redis_cache = match RedisCache::new(&redis_url).await {
         Ok(rc) => {
-            println!("connected to Redis");
+            tracing::info!(event = "redis_connected", "connected to Redis");
             Some(rc)
         }
         Err(e) => {
-            println!("Redis unavailable, running without it: {e}");
+            tracing::warn!(event = "redis_unavailable", error = %e, "Redis unavailable, running without it");
             None
         }
     };
@@ -61,10 +68,11 @@ async fn main() {
 
     let app = axum::Router::new()
         .nest("/v1", protected)
-        .nest("/v1", routes::public());
+        .nest("/v1", routes::public())
+        .layer(axum::middleware::from_fn(logging::wide_event_middleware));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
-    println!("listening on port 8000");
+    tracing::info!(event = "server_started", port = 8000, "listening on port 8000");
 
     let precompute_state = app_state.clone();
     tokio::spawn(async move {
