@@ -8,12 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { MAX_MAX_HEIGHT, type GraphsValues } from "@/lib/schemas";
 
 interface GraphQueryPanelProps {
   form: UseFormReturn<GraphsValues>;
   onSubmit: (values: GraphsValues) => void;
   onFieldChange: () => void;
+  reversed: boolean;
+  onReversedChange: (checked: boolean) => void;
   isFetching: boolean;
   error: Error | null;
 }
@@ -22,6 +26,8 @@ export function GraphQueryPanel({
   form,
   onSubmit,
   onFieldChange,
+  reversed,
+  onReversedChange,
   isFetching,
   error,
 }: GraphQueryPanelProps) {
@@ -96,6 +102,17 @@ export function GraphQueryPanel({
                     </Field>
                   )}
                 />
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="reversed"
+                  size="sm"
+                  checked={reversed}
+                  onCheckedChange={onReversedChange}
+                />
+                <Label htmlFor="reversed" className="text-xs font-normal">
+                  Reverse notation
+                </Label>
               </div>
               {error && (
                 <p className="text-destructive text-xs">

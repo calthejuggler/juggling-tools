@@ -22,6 +22,7 @@ pub struct AppState {
     pub memory_cache: moka::future::Cache<String, Bytes>,
     pub redis_cache: Option<RedisCache>,
     pub file_cache: FileCache,
+    pub schema_version: String,
 }
 
 async fn require_api_key(req: Request, next: Next) -> Result<Response, StatusCode> {
@@ -58,10 +59,13 @@ async fn main() {
         }
     };
 
+    let schema_version = std::env::var("SCHEMA_VERSION").unwrap_or_else(|_| "1".into());
+
     let app_state = AppState {
         memory_cache,
         redis_cache,
         file_cache,
+        schema_version,
     };
 
     let protected = routes::protected()

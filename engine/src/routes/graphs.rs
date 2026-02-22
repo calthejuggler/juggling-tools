@@ -32,11 +32,13 @@ async fn build_graph_response(
         we.num_props = Some(params.num_props);
         we.max_height = Some(params.max_height);
         we.compact = Some(params.compact);
+        we.reversed = Some(params.reversed);
     }
 
+    let effective_reversed = !params.compact && params.reversed;
     let key = format!(
-        "{}-{}-{}",
-        params.num_props, params.max_height, params.compact
+        "v{}-{}-{}-{}-{}",
+        app.schema_version, params.num_props, params.max_height, params.compact, effective_reversed
     );
 
     if let Some(data) = app.memory_cache.get(&key).await {
@@ -120,6 +122,7 @@ pub fn compute_graph(params: &GraphParams) -> Vec<u8> {
     let compact = params.compact;
     let max_height = params.max_height;
     let num_props = params.num_props;
+    let reversed = params.reversed;
 
     let states = State::generate(num_props, max_height);
     let num_nodes = states.len();
@@ -128,7 +131,13 @@ pub fn compute_graph(params: &GraphParams) -> Vec<u8> {
         if compact {
             s.bits().to_string()
         } else {
-            format!("\"{}\"", s.to_binary_string(max_height))
+            let binary = s.to_binary_string(max_height);
+            let display = if reversed {
+                binary.chars().rev().collect::<String>()
+            } else {
+                binary
+            };
+            format!("\"{}\"", display)
         }
     };
 
@@ -167,7 +176,9 @@ pub fn compute_graph(params: &GraphParams) -> Vec<u8> {
         }
     }
 
-    buf.push_str("],\"num_nodes\":");
+    buf.push_str("],\"ground_state\":");
+    buf.push_str(&state_value(&states[0]));
+    buf.push_str(",\"num_nodes\":");
     buf.push_str(&num_nodes.to_string());
     buf.push_str(",\"num_edges\":");
     buf.push_str(&num_edges.to_string());
@@ -190,6 +201,7 @@ mod tests {
             num_props,
             max_height,
             compact,
+            reversed: false,
         }
     }
 
@@ -212,6 +224,7 @@ mod tests {
         for key in [
             "nodes",
             "edges",
+            "ground_state",
             "num_nodes",
             "num_edges",
             "max_height",
@@ -313,5 +326,89 @@ mod tests {
         assert_eq!(json["num_edges"].as_u64().unwrap(), 1);
         let edge = &json["edges"].as_array().unwrap()[0];
         assert_eq!(edge["from"], edge["to"], "single state should self-loop");
+    }
+
+    fn make_params_reversed(
+        num_props: u8,
+        max_height: u8,
+        compact: bool,
+        reversed: bool,
+    ) -> GraphParams {
+        GraphParams {
+            num_props,
+            max_height,
+            compact,
+            reversed,
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_reversed_non_compact_reverses_strings() {
+        let normal = parse(&make_params(3, 5, false));
+        let reversed = parse(&make_params_reversed(3, 5, false, true));
+
+        let normal_nodes: Vec<&str> = normal["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|n| n.as_str().unwrap())
+            .collect();
+        let reversed_nodes: Vec<&str> = reversed["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|n| n.as_str().unwrap())
+            .collect();
+
+        assert_eq!(normal_nodes.len(), reversed_nodes.len());
+        for (n, r) in normal_nodes.iter().zip(reversed_nodes.iter()) {
+            let expected: String = n.chars().rev().collect();
+            assert_eq!(
+                *r,
+                expected.as_str(),
+                "reversed node should be mirror of normal"
+            );
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_ground_state_compact() {
+        for (num_props, max_height) in [(3, 5), (2, 4), (1, 3), (4, 4)] {
+            let json = parse(&make_params(num_props, max_height, true));
+            let ground_state = json["ground_state"].as_u64().unwrap();
+            let expected = (1u64 << num_props) - 1;
+            assert_eq!(
+                ground_state, expected,
+                "ground_state for num_props={}, max_height={} should be {}",
+                num_props, max_height, expected
+            );
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_ground_state_non_compact() {
+        let json = parse(&make_params(3, 5, false));
+        let ground_state = json["ground_state"].as_str().unwrap();
+        assert_eq!(ground_state, "00111", "ground_state for 3/5 non-compact");
+    }
+
+    #[test]
+    fn test_compute_graph_ground_state_non_compact_reversed() {
+        let json = parse(&make_params_reversed(3, 5, false, true));
+        let ground_state = json["ground_state"].as_str().unwrap();
+        assert_eq!(
+            ground_state, "11100",
+            "ground_state for 3/5 non-compact reversed"
+        );
+    }
+
+    #[test]
+    fn test_compute_graph_reversed_compact_is_identical() {
+        let normal = parse(&make_params(3, 5, true));
+        let reversed = parse(&make_params_reversed(3, 5, true, true));
+        assert_eq!(
+            normal, reversed,
+            "compact mode should be identical regardless of reversed"
+        );
     }
 }

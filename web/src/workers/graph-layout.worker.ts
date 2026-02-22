@@ -4,6 +4,7 @@ import type { GraphApiResponse } from "@/lib/graph-types";
 export interface LayoutRequest {
   id: number;
   data: GraphApiResponse;
+  reversed: boolean;
 }
 
 export interface LayoutResponse {
@@ -12,7 +13,7 @@ export interface LayoutResponse {
 }
 
 self.onmessage = (event: MessageEvent<LayoutRequest>) => {
-  const { id, data } = event.data;
-  const layout = computeGraphLayout(data);
+  const { id, data, reversed } = event.data;
+  const layout = computeGraphLayout(data, reversed);
   self.postMessage({ id, layout } satisfies LayoutResponse);
 };

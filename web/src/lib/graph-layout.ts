@@ -5,33 +5,39 @@ import type { ExpandedGraphResponse, GraphApiResponse, GraphEdge, GraphNode } fr
 const NODE_WIDTH = 120;
 const NODE_HEIGHT = 40;
 
-function expandCompactResponse(data: GraphApiResponse): ExpandedGraphResponse {
-  const { max_height } = data;
+function toBinaryLabel(n: number, maxHeight: number, reversed: boolean): string {
+  const binary = n.toString(2).padStart(maxHeight, "0");
+  return reversed ? binary.split("").reverse().join("") : binary;
+}
+
+function expandCompactResponse(data: GraphApiResponse, reversed: boolean): ExpandedGraphResponse {
+  const { max_height, nodes, edges, ground_state, ...rest } = data;
   return {
-    ...data,
-    nodes: data.nodes.map((n) => n.toString(2).padStart(max_height, "0")),
-    edges: data.edges.map((e) => ({
-      from: e.from.toString(2).padStart(max_height, "0"),
-      to: e.to.toString(2).padStart(max_height, "0"),
+    ...rest,
+    max_height,
+    nodes: nodes.map((n) => toBinaryLabel(n, max_height, reversed)),
+    edges: edges.map((e) => ({
+      from: toBinaryLabel(e.from, max_height, reversed),
+      to: toBinaryLabel(e.to, max_height, reversed),
       throw_height: e.throw_height,
     })),
+    ground_state: toBinaryLabel(ground_state, max_height, reversed),
   };
 }
 
-function getBaseNodeId(data: ExpandedGraphResponse): string {
-  return "0".repeat(data.max_height - data.num_props) + "1".repeat(data.num_props);
-}
-
-export function computeGraphLayout(data: GraphApiResponse): {
+export function computeGraphLayout(
+  data: GraphApiResponse,
+  reversed: boolean,
+): {
   nodes: GraphNode[];
   edges: GraphEdge[];
 } {
-  const expanded = expandCompactResponse(data);
+  const expanded = expandCompactResponse(data, reversed);
   const g = new dagre.graphlib.Graph();
   g.setGraph({ rankdir: "TB" });
   g.setDefaultEdgeLabel(() => ({}));
 
-  const baseId = getBaseNodeId(expanded);
+  const baseId = expanded.ground_state;
 
   for (const node of expanded.nodes) {
     g.setNode(node, { width: NODE_WIDTH, height: NODE_HEIGHT });

@@ -12,6 +12,7 @@ export const GraphResponse = t.Object(
   {
     nodes: t.Array(t.Union([t.String(), t.Integer()])),
     edges: t.Array(Edge),
+    ground_state: t.Union([t.String(), t.Integer()]),
     num_nodes: t.Integer(),
     num_edges: t.Integer(),
     max_height: t.Integer(),

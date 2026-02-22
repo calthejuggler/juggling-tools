@@ -6,6 +6,7 @@ export type WideEvent = {
   num_props?: number;
   max_height?: number;
   compact?: boolean;
+  reversed?: boolean;
   cache_hit?: string;
   engine_status?: number;
   error_code?: string;

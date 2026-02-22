@@ -9,6 +9,7 @@ export interface GraphApiEdge {
 export interface GraphApiResponse {
   nodes: number[];
   edges: GraphApiEdge[];
+  ground_state: number;
   num_nodes: number;
   num_edges: number;
   max_height: number;
@@ -24,6 +25,7 @@ export interface ExpandedGraphEdge {
 export interface ExpandedGraphResponse {
   nodes: string[];
   edges: ExpandedGraphEdge[];
+  ground_state: string;
   num_nodes: number;
   num_edges: number;
   max_height: number;

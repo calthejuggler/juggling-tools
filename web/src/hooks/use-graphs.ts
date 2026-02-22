@@ -6,8 +6,9 @@ import type { GraphsValues } from "@/lib/schemas";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export function useGraphs(params: GraphsValues | null) {
+  const queryKey = params ? { num_props: params.num_props, max_height: params.max_height } : null;
   return useQuery<GraphApiResponse>({
-    queryKey: ["graphs", params],
+    queryKey: ["graphs", queryKey],
     enabled: params !== null,
     staleTime: Infinity,
     retry: (_failureCount, error) =>

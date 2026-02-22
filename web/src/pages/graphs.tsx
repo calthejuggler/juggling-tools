@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,15 @@ import { Route } from "@/routes/_authed/index";
 export function GraphsPage() {
   const { num_props, max_height } = Route.useSearch();
   const navigate = Route.useNavigate();
+
+  const [reversed, setReversed] = useState(
+    () => localStorage.getItem("jgraph-reversed") === "true",
+  );
+
+  const handleReversedChange = useCallback((checked: boolean) => {
+    setReversed(checked);
+    localStorage.setItem("jgraph-reversed", String(checked));
+  }, []);
 
   const submitted: GraphsValues = { num_props, max_height };
 
@@ -48,6 +57,8 @@ export function GraphsPage() {
     <div className="h-full w-full">
       <GraphCanvas
         data={data}
+        reversed={reversed}
+        onReversedChange={handleReversedChange}
         form={form}
         onSubmit={onSubmit}
         onFieldChange={onFieldChange}

@@ -26,6 +26,8 @@ const EMPTY_EDGES: GraphEdge[] = [];
 
 interface GraphCanvasProps {
   data: GraphApiResponse | undefined;
+  reversed: boolean;
+  onReversedChange: (checked: boolean) => void;
   form: UseFormReturn<GraphsValues>;
   onSubmit: (values: GraphsValues) => void;
   onFieldChange: () => void;
@@ -35,6 +37,8 @@ interface GraphCanvasProps {
 
 export function GraphCanvas({
   data,
+  reversed,
+  onReversedChange,
   form,
   onSubmit,
   onFieldChange,
@@ -42,11 +46,11 @@ export function GraphCanvas({
   error,
 }: GraphCanvasProps) {
   const { theme } = useTheme();
-  const layout = useGraphLayout(data);
+  const layout = useGraphLayout(data, reversed);
 
   const isLayoutPending = !!data && !layout;
   const isLoading = isFetching || isLayoutPending;
-  const key = layout ? `${data!.num_props}-${data!.max_height}` : "empty";
+  const key = layout ? `${data!.num_props}-${data!.max_height}-${reversed}` : "empty";
 
   return (
     <ReactFlow
@@ -70,6 +74,8 @@ export function GraphCanvas({
         form={form}
         onSubmit={onSubmit}
         onFieldChange={onFieldChange}
+        reversed={reversed}
+        onReversedChange={onReversedChange}
         isFetching={isLoading}
         error={error}
       />

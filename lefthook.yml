@@ -13,4 +13,6 @@ pre-commit:
       run: bunx prettier --write {staged_files}
     format-rust:
       glob: "engine/src/**/*.rs"
+      root: engine/
       run: cargo fmt
+      stage_fixed: true

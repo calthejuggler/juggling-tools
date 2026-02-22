@@ -36,36 +36,47 @@ pub async fn precompute(
             }
 
             for compact in [false, true] {
-                let key = format!("{}-{}-{}", num_props, max_height, compact);
+                // For compact mode, reversed has no effect (integers are direction-agnostic),
+                // so only precompute reversed=false. For non-compact, precompute both.
+                let reversed_variants: &[bool] = if compact { &[false] } else { &[false, true] };
 
-                if file_cache.exists(&key).await {
-                    cached += 1;
-                    continue;
+                for &reversed in reversed_variants {
+                    let effective_reversed = !compact && reversed;
+                    let key = format!(
+                        "{}-{}-{}-{}",
+                        num_props, max_height, compact, effective_reversed
+                    );
+
+                    if file_cache.exists(&key).await {
+                        cached += 1;
+                        continue;
+                    }
+
+                    let params = GraphParams {
+                        num_props,
+                        max_height,
+                        compact,
+                        reversed,
+                    };
+
+                    let data = tokio::task::spawn_blocking(move || compute_graph(&params))
+                        .await
+                        .expect("compute_graph panicked");
+
+                    file_cache.put(&key, &data).await;
+
+                    if let Some(rc) = redis_cache
+                        && fits_in_redis(&data)
+                    {
+                        rc.put(&key, &data).await;
+                    }
+
+                    if fits_in_memory(&data) {
+                        memory_cache.insert(key.clone(), Bytes::from(data)).await;
+                    }
+
+                    computed += 1;
                 }
-
-                let params = GraphParams {
-                    num_props,
-                    max_height,
-                    compact,
-                };
-
-                let data = tokio::task::spawn_blocking(move || compute_graph(&params))
-                    .await
-                    .expect("compute_graph panicked");
-
-                file_cache.put(&key, &data).await;
-
-                if let Some(rc) = redis_cache
-                    && fits_in_redis(&data)
-                {
-                    rc.put(&key, &data).await;
-                }
-
-                if fits_in_memory(&data) {
-                    memory_cache.insert(key.clone(), Bytes::from(data)).await;
-                }
-
-                computed += 1;
             }
         }
     }

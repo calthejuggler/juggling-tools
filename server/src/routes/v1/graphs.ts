@@ -6,6 +6,7 @@ import { ErrorResponse, GraphResponse } from "../../lib/schemas";
 
 const ENGINE_URL = Bun.env.ENGINE_URL ?? "http://localhost:8000";
 const ENGINE_API_KEY = Bun.env.ENGINE_API_KEY ?? "";
+const SCHEMA_VERSION = Bun.env.SCHEMA_VERSION ?? "1";
 
 const graphQuerySchema = t.Object({
   num_props: t.Integer({
@@ -27,6 +28,13 @@ const graphQuerySchema = t.Object({
         "When true, nodes are represented as integers (bitmask). When false, nodes are binary strings",
     }),
   ),
+  reversed: t.Optional(
+    t.Boolean({
+      default: false,
+      description:
+        "When true, binary string nodes are displayed LSB-first (reversed). No effect when compact=true",
+    }),
+  ),
 });
 
 export const graphsRoute = new Elysia().use(graphRateLimit).get(
@@ -40,6 +48,7 @@ export const graphsRoute = new Elysia().use(graphRateLimit).get(
       wideEvent.num_props = query.num_props;
       wideEvent.max_height = query.max_height;
       wideEvent.compact = query.compact ?? false;
+      wideEvent.reversed = query.reversed ?? false;
     }
 
     if (query.max_height < query.num_props) {
@@ -48,7 +57,7 @@ export const graphsRoute = new Elysia().use(graphRateLimit).get(
       return { error: "max_height must be >= num_props" };
     }
 
-    const etag = `"${query.num_props}-${query.max_height}-${query.compact ?? false}"`;
+    const etag = `"v${SCHEMA_VERSION}-${query.num_props}-${query.max_height}-${query.compact ?? false}-${query.reversed ?? false}"`;
 
     if (headers["if-none-match"] === etag) {
       set.status = 304;
@@ -60,6 +69,7 @@ export const graphsRoute = new Elysia().use(graphRateLimit).get(
       num_props: String(query.num_props),
       max_height: String(query.max_height),
       compact: String(query.compact ?? false),
+      reversed: String(query.reversed ?? false),
     });
 
     let engineRes: Response;
@@ -84,7 +94,7 @@ export const graphsRoute = new Elysia().use(graphRateLimit).get(
     return new Response(engineRes.body, {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "public, no-cache",
         ETag: etag,
       },
     });

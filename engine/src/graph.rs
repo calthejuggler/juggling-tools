@@ -7,6 +7,8 @@ pub struct GraphParams {
     pub max_height: u8,
     #[serde(default)]
     pub compact: bool,
+    #[serde(default)]
+    pub reversed: bool,
 }
 
 impl GraphParams {
@@ -33,6 +35,7 @@ mod tests {
             num_props,
             max_height,
             compact: false,
+            reversed: false,
         }
     }
 

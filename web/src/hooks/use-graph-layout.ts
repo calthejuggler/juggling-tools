@@ -14,6 +14,7 @@ const listeners = new Set<() => void>();
 let snapshot: LayoutResponse | null = null;
 
 let lastRequestedData: GraphApiResponse | undefined;
+let lastRequestedReversed: boolean | undefined;
 let requestId = 0;
 
 worker.addEventListener("message", (event: MessageEvent<LayoutResponse>) => {
@@ -32,16 +33,20 @@ function getSnapshot() {
   return snapshot;
 }
 
-function requestLayout(data: GraphApiResponse): number {
-  if (lastRequestedData === data) return requestId;
+function requestLayout(data: GraphApiResponse, reversed: boolean): number {
+  if (lastRequestedData === data && lastRequestedReversed === reversed) return requestId;
   lastRequestedData = data;
+  lastRequestedReversed = reversed;
   requestId++;
-  worker.postMessage({ id: requestId, data });
+  worker.postMessage({ id: requestId, data, reversed });
   return requestId;
 }
 
-export function useGraphLayout(data: GraphApiResponse | undefined): GraphLayout | null {
-  const currentId = data ? requestLayout(data) : -1;
+export function useGraphLayout(
+  data: GraphApiResponse | undefined,
+  reversed: boolean,
+): GraphLayout | null {
+  const currentId = data ? requestLayout(data, reversed) : -1;
   const result = useSyncExternalStore(subscribe, getSnapshot);
 
   if (result?.id !== currentId) return null;
