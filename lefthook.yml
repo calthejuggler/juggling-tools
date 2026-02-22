@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint-web:
+      glob: "web/src/**/*.{ts,tsx}"
+      run: bunx eslint --fix {staged_files}
+    lint-server:
+      glob: "server/src/**/*.ts"
+      run: bunx eslint --fix {staged_files}
+    format-js:
+      glob: "**/*.{ts,tsx,js,json,md}"
+      exclude: "engine/**"
+      run: bunx prettier --write {staged_files}
+    format-rust:
+      glob: "engine/src/**/*.rs"
+      run: cargo fmt

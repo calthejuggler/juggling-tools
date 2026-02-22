@@ -17,6 +17,16 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  lint-format:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run format:check
+
   engine-check:
     name: Engine Check
     runs-on: ubuntu-latest

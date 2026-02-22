@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "@/lib/auth-client";
-import { loginSchema, type LoginValues } from "@/lib/schemas";
+import { Link, useNavigate } from "@tanstack/react-router";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { signIn } from "@/lib/auth-client";
+import { loginSchema, type LoginValues } from "@/lib/schemas";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -74,18 +76,12 @@ export function LoginPage() {
                 </Field>
               )}
             />
-            {serverError && (
-              <p className="text-sm text-destructive">{serverError}</p>
-            )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
+            {serverError && <p className="text-destructive text-sm">{serverError}</p>}
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-4 text-center text-sm">
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary underline">
               Sign up

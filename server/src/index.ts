@@ -1,12 +1,13 @@
-import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { auth } from "./lib/auth";
-import { runMigrations } from "./db";
-import { loggingPlugin } from "./lib/logging";
-import { logger } from "./lib/logger";
-import { routes } from "./routes";
+import { Elysia } from "elysia";
+
 import packageJson from "../package.json";
+import { runMigrations } from "./db";
+import { auth } from "./lib/auth";
+import { logger } from "./lib/logger";
+import { loggingPlugin } from "./lib/logging";
+import { routes } from "./routes";
 
 const main = async () => {
   try {

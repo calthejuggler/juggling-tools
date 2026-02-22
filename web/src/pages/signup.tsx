@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signUp } from "@/lib/auth-client";
-import { signupSchema, type SignupValues } from "@/lib/schemas";
+import { Link, useNavigate } from "@tanstack/react-router";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { signUp } from "@/lib/auth-client";
+import { signupSchema, type SignupValues } from "@/lib/schemas";
 
 export function SignupPage() {
   const navigate = useNavigate();
@@ -36,9 +38,7 @@ export function SignupPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-center text-2xl">
-            Create account
-          </CardTitle>
+          <CardTitle className="text-center text-2xl">Create account</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -93,20 +93,12 @@ export function SignupPage() {
                 </Field>
               )}
             />
-            {serverError && (
-              <p className="text-sm text-destructive">{serverError}</p>
-            )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting
-                ? "Creating account..."
-                : "Sign up"}
+            {serverError && <p className="text-destructive text-sm">{serverError}</p>}
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Creating account..." : "Sign up"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link to="/login" className="text-primary underline">
               Sign in

@@ -8,12 +8,12 @@ Each juggling state is stored as a 32-bit field where set bits represent future 
 
 ## Tech stack
 
-| Layer | Stack |
-|---|---|
+| Layer    | Stack                                                                    |
+| -------- | ------------------------------------------------------------------------ |
 | Frontend | React 19, Vite, TanStack Router + Query, Tailwind CSS 4, Shadcn/Radix UI |
-| Backend | Elysia.js (Bun), better-auth, Drizzle ORM, PostgreSQL |
-| Engine | Rust, Axum, Tokio with a 3-tier cache (memory / Redis / file) |
-| Infra | Docker Compose, Caddy |
+| Backend  | Elysia.js (Bun), better-auth, Drizzle ORM, PostgreSQL                    |
+| Engine   | Rust, Axum, Tokio with a 3-tier cache (memory / Redis / file)            |
+| Infra    | Docker Compose, Caddy                                                    |
 
 ## Prerequisites
 
@@ -46,11 +46,17 @@ engine/    Rust graph computation with multi-tier caching
 Auth is email/password via better-auth (`/api/auth/*`).
 
 Graph query (requires auth):
+
 ```
 GET /api/v1/graphs?num_props=3&max_height=5&compact=false
 ```
 
 Returns nodes, edges with throw heights, and counts. Responses use ETags and a 3-tier cache in the engine. Common graphs are precomputed on startup.
+
+## Code quality
+
+Pre-commit hooks (via lefthook) auto-format and lint staged files.
+Run `bun run lint` and `bun run format:check` manually, or let CI catch it.
 
 ## License
 

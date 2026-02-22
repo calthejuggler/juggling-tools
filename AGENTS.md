@@ -32,6 +32,12 @@ bun run db:push          # Push schema changes to DB
 bun run db:generate      # Generate migration files
 bun run db:migrate       # Run migrations
 bun run db:studio        # Visual DB explorer
+
+# Linting & Formatting
+bun run lint             # ESLint check (web + server + scripts)
+bun run lint:fix         # Auto-fix lint errors
+bun run format           # Format all files with Prettier
+bun run format:check     # Check formatting (CI mode)
 ```
 
 Environment: copy `.env.example` to `.env` and fill in secrets before running.
@@ -84,3 +90,4 @@ Client → Server (validates params, checks ETag) → Engine (3-tier cache: memo
 - **Drizzle migrations** run automatically on server startup (`src/db/index.ts`)
 - **Route file naming**: TanStack Router uses `_` prefix for layout routes, `__root.tsx` for root layout
 - **Engine gracefully degrades** without Redis (falls back to memory + file cache)
+- **Pre-commit hooks** (lefthook) auto-format and lint staged files on commit

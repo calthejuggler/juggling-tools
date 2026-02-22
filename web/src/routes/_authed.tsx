@@ -1,7 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { useSession, signOut } from "@/lib/auth-client";
-import { useTheme } from "@/hooks/use-theme";
+
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
+import { signOut, useSession } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: async () => {
@@ -22,7 +23,7 @@ function AuthedLayout() {
 
   return (
     <>
-      <header className="border-b border-border bg-card">
+      <header className="border-border bg-card border-b">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
           <h1 className="text-lg font-semibold">jgraph</h1>
           <div className="flex items-center gap-3">
@@ -30,7 +31,7 @@ function AuthedLayout() {
               {theme === "dark" ? "Light" : "Dark"}
             </Button>
             {session?.user && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 {session.user.name || session.user.email}
               </span>
             )}

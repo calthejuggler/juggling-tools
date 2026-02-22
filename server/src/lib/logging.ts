@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+
 import { logger } from "./logger";
 
 export type WideEvent = {

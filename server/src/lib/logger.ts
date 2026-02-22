@@ -10,11 +10,21 @@ export function createLogger(baseFields?: BaseFields) {
 
   return {
     info(fields: Record<string, unknown>) {
-      const line = JSON.stringify({ level: "info", ...base, ...fields, timestamp: new Date().toISOString() });
+      const line = JSON.stringify({
+        level: "info",
+        ...base,
+        ...fields,
+        timestamp: new Date().toISOString(),
+      });
       process.stdout.write(line + "\n");
     },
     error(fields: Record<string, unknown>) {
-      const line = JSON.stringify({ level: "error", ...base, ...fields, timestamp: new Date().toISOString() });
+      const line = JSON.stringify({
+        level: "error",
+        ...base,
+        ...fields,
+        timestamp: new Date().toISOString(),
+      });
       process.stderr.write(line + "\n");
     },
   };

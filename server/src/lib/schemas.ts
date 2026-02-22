@@ -1,9 +1,6 @@
 import { t } from "elysia";
 
-export const ErrorResponse = t.Object(
-  { error: t.String() },
-  { description: "Error response" },
-);
+export const ErrorResponse = t.Object({ error: t.String() }, { description: "Error response" });
 
 const Edge = t.Object({
   from: t.Union([t.String(), t.Integer()]),

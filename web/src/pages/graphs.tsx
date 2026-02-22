@@ -1,3 +1,7 @@
+import { Controller, useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -5,8 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useGraphs } from "@/hooks/use-graphs";
 import { graphsSchema, MAX_MAX_HEIGHT, type GraphsValues } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
 import { Route } from "@/routes/_authed/index";
 
 export function GraphsPage() {
@@ -93,11 +95,7 @@ export function GraphsPage() {
               control={form.control}
               render={({ field }) => (
                 <Field orientation="horizontal">
-                  <Switch
-                    id="compact"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch id="compact" checked={field.value} onCheckedChange={field.onChange} />
                   <FieldLabel htmlFor="compact">Compact</FieldLabel>
                 </Field>
               )}
@@ -112,7 +110,7 @@ export function GraphsPage() {
       {error && (
         <Card className="border-destructive">
           <CardContent className="pt-6">
-            <p className="text-sm text-destructive">
+            <p className="text-destructive text-sm">
               {error instanceof Error ? error.message : "Request failed"}
             </p>
           </CardContent>
@@ -125,14 +123,14 @@ export function GraphsPage() {
             <CardTitle className="text-base">
               Results
               {nodeCount != null && edgeCount != null && (
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                <span className="text-muted-foreground ml-2 text-sm font-normal">
                   {nodeCount} nodes, {edgeCount} edges
                 </span>
               )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <pre className="max-h-[600px] overflow-auto rounded-md bg-muted p-4 text-sm">
+            <pre className="bg-muted max-h-[600px] overflow-auto rounded-md p-4 text-sm">
               {JSON.stringify(data, null, 2)}
             </pre>
           </CardContent>

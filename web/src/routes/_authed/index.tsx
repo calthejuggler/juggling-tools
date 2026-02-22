@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GraphsPage } from "@/pages/graphs";
 import { z } from "zod";
+
 import { MAX_MAX_HEIGHT } from "@/lib/schemas";
+import { GraphsPage } from "@/pages/graphs";
 
 const searchSchema = z.object({
   num_props: z.number().int().min(1).max(MAX_MAX_HEIGHT).optional().catch(undefined),

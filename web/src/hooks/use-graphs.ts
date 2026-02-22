@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import type { GraphsValues } from "@/lib/schemas";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -21,9 +22,7 @@ export function useGraphs(params: GraphsValues | null) {
       if (res.status === 429) {
         const retryAfter = res.headers.get("Retry-After");
         const seconds = retryAfter ? parseInt(retryAfter, 10) : 60;
-        throw new Error(
-          `Too many requests. Please try again in ${seconds} seconds.`,
-        );
+        throw new Error(`Too many requests. Please try again in ${seconds} seconds.`);
       }
 
       if (!res.ok) {
