@@ -50,7 +50,7 @@ export function GraphsPage() {
                       id="num_props"
                       type="number"
                       min={1}
-                      max={32}
+                      max={10}
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       onBlur={field.onBlur}
@@ -71,7 +71,7 @@ export function GraphsPage() {
                       id="max_height"
                       type="number"
                       min={1}
-                      max={32}
+                      max={10}
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       onBlur={field.onBlur}

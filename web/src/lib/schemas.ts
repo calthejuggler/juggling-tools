@@ -15,10 +15,12 @@ export const signupSchema = z.object({
 
 export type SignupValues = z.infer<typeof signupSchema>;
 
+const MAX_MAX_HEIGHT = 13;
+
 export const graphsSchema = z
   .object({
-    num_props: z.number().int().min(1).max(32),
-    max_height: z.number().int().min(1).max(32),
+    num_props: z.number().int().min(1).max(MAX_MAX_HEIGHT),
+    max_height: z.number().int().min(1).max(MAX_MAX_HEIGHT),
     compact: z.boolean(),
   })
   .refine((data) => data.max_height >= data.num_props, {
