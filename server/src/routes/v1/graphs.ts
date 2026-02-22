@@ -1,4 +1,5 @@
 import { Elysia, t } from "elysia";
+import type { WideEvent } from "../../lib/logging";
 
 const ENGINE_URL = Bun.env.ENGINE_URL ?? "http://localhost:8000";
 const ENGINE_API_KEY = Bun.env.ENGINE_API_KEY ?? "";
@@ -12,9 +13,19 @@ const graphQuerySchema = t.Object({
 export const graphsRoute = new Elysia()
   .get(
     "/graphs",
-    async ({ query, set, headers }) => {
+    async (ctx) => {
+      const { query, set, headers } = ctx;
+      const wideEvent = (ctx as unknown as { wideEvent: WideEvent }).wideEvent;
+
+      if (wideEvent) {
+        wideEvent.num_balls = query.num_balls;
+        wideEvent.max_height = query.max_height;
+        wideEvent.compact = query.compact ?? false;
+      }
+
       if (query.max_height < query.num_balls) {
         set.status = 400;
+        if (wideEvent) wideEvent.error_message = "max_height must be >= num_balls";
         return { error: "max_height must be >= num_balls" };
       }
 
@@ -22,6 +33,7 @@ export const graphsRoute = new Elysia()
 
       if (headers["if-none-match"] === etag) {
         set.status = 304;
+        if (wideEvent) wideEvent.cache_hit = "client";
         return;
       }
 
@@ -41,11 +53,15 @@ export const graphsRoute = new Elysia()
         );
       } catch {
         set.status = 503;
+        if (wideEvent) wideEvent.error_message = "Engine unavailable";
         return { error: "Engine unavailable" };
       }
 
+      if (wideEvent) wideEvent.engine_status = engineRes.status;
+
       if (!engineRes.ok) {
         set.status = engineRes.status;
+        if (wideEvent) wideEvent.error_message = `Engine returned ${engineRes.status}`;
         return engineRes.text();
       }
 
