@@ -15,14 +15,28 @@ Checklist of features from the [State Notation wiki](https://juggle.fandom.com/w
 
 ## Not Yet Implemented
 
+### Core Engine
+
 - [ ] Abbreviated state notation, e.g. `111` -> `000`
-- [ ] Ground state labeling/highlighting in the UI
-- [ ] Excited state identification/filtering
 - [ ] Prime vs composite siteswap detection
 - [ ] Multiplex states
 - [ ] Synchronous/async states
+- [ ] Wildcard state matching
+
+### UI Features
+
+- [ ] Ground state labeling/highlighting in the UI
+- [ ] Excited state identification/filtering
 - [ ] Siteswap pattern input
 - [ ] Throw height filtering
-- [ ] Wildcard state matching
+- [ ] Siteswap builder
+
+### User Experience
+
 - [ ] Onboarding
 - [ ] Tutorial
+
+### Distribution
+
+- [ ] Rust crate
+- [ ] Production deployment
