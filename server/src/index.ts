@@ -188,6 +188,7 @@ const main = async () => {
     )
     .use(routes)
     .mount(auth.handler)
+    .get("/health", () => "ok")
     .get("/", () => "Hello Elysia")
     .listen(3000);
 

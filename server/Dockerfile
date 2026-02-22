@@ -1,4 +1,4 @@
-FROM oven/bun AS builder
+FROM oven/bun:alpine AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,8 @@ RUN bun build \
 	--outfile server \
 	src/index.ts
 
-FROM gcr.io/distroless/base
+FROM alpine:3.21
+RUN apk add --no-cache libstdc++ libgcc
 
 WORKDIR /app
 
@@ -29,5 +30,6 @@ COPY --from=builder /app/drizzle ./drizzle
 ENV NODE_ENV=production
 
 EXPOSE 3000
-
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/health || exit 1
 CMD ["./server"]

@@ -20,4 +20,6 @@ COPY --from=builder /app/target/release/engine .
 RUN mkdir -p /app/cache && chown app:app /app/cache
 USER app
 EXPOSE 8000
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:8000/v1/health || exit 1
 CMD ["./engine"]
