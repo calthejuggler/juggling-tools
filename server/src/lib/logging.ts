@@ -27,6 +27,7 @@ export const loggingPlugin = new Elysia({ name: "logging" })
     };
   })
   .onError({ as: "global" }, ({ wideEvent, error, code }) => {
+    if (!wideEvent) return;
     wideEvent.error_code = String(code);
     wideEvent.error_message = "message" in error ? String(error.message) : String(error);
   })
