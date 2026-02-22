@@ -1,6 +1,7 @@
 use redis::AsyncCommands;
 
 const MAX_REDIS_SIZE: usize = 5 * 1024 * 1024; // 5 MB
+const TTL_SECONDS: u64 = 7 * 24 * 60 * 60; // 7 days
 
 #[derive(Clone)]
 pub struct RedisCache {
@@ -27,7 +28,7 @@ impl RedisCache {
             return;
         }
         let mut conn = self.conn.clone();
-        let _: Result<(), _> = conn.set(key, data).await;
+        let _: Result<(), _> = conn.set_ex(key, data, TTL_SECONDS).await;
     }
 }
 
