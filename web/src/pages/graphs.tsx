@@ -41,11 +41,10 @@ export function GraphsPage() {
 
   const debouncedNavigate = useDebouncedCallback(navigateToSearch, 400);
 
-  function onFieldChange() {
-    const values = form.getValues();
-    const result = graphsSchema.safeParse(values);
-    if (result.success) {
-      debouncedNavigate(result.data);
+  async function onFieldChange() {
+    const isValid = await form.trigger();
+    if (isValid) {
+      debouncedNavigate(form.getValues());
     }
   }
 
