@@ -1,8 +1,8 @@
+use axum::Extension;
 use axum::body::Body;
 use axum::extract::{Query, State as AxumState};
 use axum::http::{StatusCode, header};
 use axum::response::Response;
-use axum::Extension;
 use bytes::Bytes;
 
 use crate::cache::memory::fits_in_memory;
@@ -178,4 +178,140 @@ pub fn compute_graph(params: &GraphParams) -> Vec<u8> {
     buf.push('}');
 
     buf.into_bytes()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::Value;
+
+    fn make_params(num_props: u8, max_height: u8, compact: bool) -> GraphParams {
+        GraphParams {
+            num_props,
+            max_height,
+            compact,
+        }
+    }
+
+    fn parse(params: &GraphParams) -> Value {
+        let data = compute_graph(params);
+        serde_json::from_slice(&data).expect("invalid JSON")
+    }
+
+    #[test]
+    fn test_compute_graph_valid_json() {
+        let params = make_params(3, 5, false);
+        let data = compute_graph(&params);
+        let result: Result<Value, _> = serde_json::from_slice(&data);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_compute_graph_has_required_fields() {
+        let json = parse(&make_params(3, 5, false));
+        for key in [
+            "nodes",
+            "edges",
+            "num_nodes",
+            "num_edges",
+            "max_height",
+            "num_props",
+        ] {
+            assert!(json.get(key).is_some(), "missing key: {}", key);
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_node_count_matches() {
+        use crate::cache::precompute::combinations;
+        let params = make_params(3, 5, false);
+        let json = parse(&params);
+        let num_nodes = json["num_nodes"].as_u64().unwrap() as usize;
+        let nodes = json["nodes"].as_array().unwrap();
+        let expected = combinations(5, 3) as usize;
+        assert_eq!(num_nodes, expected);
+        assert_eq!(nodes.len(), expected);
+    }
+
+    #[test]
+    fn test_compute_graph_edge_count_matches() {
+        let json = parse(&make_params(3, 5, false));
+        let num_edges = json["num_edges"].as_u64().unwrap() as usize;
+        let edges = json["edges"].as_array().unwrap();
+        // 3 props in 5 slots: 6 states with rightmost=1 produce 3 transitions each (18),
+        // plus 4 states with rightmost=0 produce 1 each (4) = 22 total
+        assert_eq!(num_edges, 22);
+        assert_eq!(edges.len(), 22);
+    }
+
+    #[test]
+    fn test_compute_graph_compact_nodes_are_integers() {
+        let json = parse(&make_params(3, 5, true));
+        let nodes = json["nodes"].as_array().unwrap();
+        for node in nodes {
+            assert!(
+                node.is_number(),
+                "compact node should be a number, got: {}",
+                node
+            );
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_non_compact_nodes_are_strings() {
+        let json = parse(&make_params(3, 5, false));
+        let nodes = json["nodes"].as_array().unwrap();
+        for node in nodes {
+            assert!(
+                node.is_string(),
+                "non-compact node should be a string, got: {}",
+                node
+            );
+            let s = node.as_str().unwrap();
+            assert_eq!(s.len(), 5, "binary string should match max_height");
+            assert!(
+                s.chars().all(|c| c == '0' || c == '1'),
+                "node string should contain only '0' and '1', got: {}",
+                s
+            );
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_edge_structure() {
+        let json = parse(&make_params(3, 5, false));
+        let edges = json["edges"].as_array().unwrap();
+        for edge in edges {
+            assert!(edge.get("from").is_some(), "edge missing 'from'");
+            assert!(edge.get("to").is_some(), "edge missing 'to'");
+            assert!(
+                edge.get("throw_height").is_some(),
+                "edge missing 'throw_height'"
+            );
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_edges_reference_valid_nodes() {
+        let json = parse(&make_params(3, 5, false));
+        let nodes: std::collections::HashSet<&Value> =
+            json["nodes"].as_array().unwrap().iter().collect();
+        let edges = json["edges"].as_array().unwrap();
+        for edge in edges {
+            let from = &edge["from"];
+            let to = &edge["to"];
+            assert!(nodes.contains(from), "edge 'from' {} not in nodes", from);
+            assert!(nodes.contains(to), "edge 'to' {} not in nodes", to);
+        }
+    }
+
+    #[test]
+    fn test_compute_graph_single_state() {
+        // num_props == max_height → only one state (all bits set), one self-loop
+        let json = parse(&make_params(3, 3, false));
+        assert_eq!(json["num_nodes"].as_u64().unwrap(), 1);
+        assert_eq!(json["num_edges"].as_u64().unwrap(), 1);
+        let edge = &json["edges"].as_array().unwrap()[0];
+        assert_eq!(edge["from"], edge["to"], "single state should self-loop");
+    }
 }

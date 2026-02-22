@@ -36,7 +36,9 @@ async fn require_api_key(req: Request, next: Next) -> Result<Response, StatusCod
 async fn main() {
     tracing_subscriber::fmt()
         .json()
-        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+        )
         .init();
 
     let cache_dir = std::env::var("CACHE_DIR").unwrap_or_else(|_| "/app/cache".to_string());
@@ -72,7 +74,11 @@ async fn main() {
         .layer(axum::middleware::from_fn(logging::wide_event_middleware));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
-    tracing::info!(event = "server_started", port = 8000, "listening on port 8000");
+    tracing::info!(
+        event = "server_started",
+        port = 8000,
+        "listening on port 8000"
+    );
 
     let precompute_state = app_state.clone();
     tokio::spawn(async move {

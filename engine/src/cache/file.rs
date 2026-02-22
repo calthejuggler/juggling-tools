@@ -43,3 +43,53 @@ impl FileCache {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    async fn temp_cache() -> (FileCache, tempfile::TempDir) {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = FileCache::new(dir.path().to_path_buf()).await;
+        (cache, dir)
+    }
+
+    #[tokio::test]
+    async fn test_put_and_get() {
+        let (cache, _dir) = temp_cache().await;
+        cache.put("key1", b"hello world").await;
+        let data = cache.get("key1").await.unwrap();
+        assert_eq!(data, b"hello world");
+    }
+
+    #[tokio::test]
+    async fn test_get_missing_key() {
+        let (cache, _dir) = temp_cache().await;
+        assert!(cache.get("nonexistent").await.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_exists() {
+        let (cache, _dir) = temp_cache().await;
+        assert!(!cache.exists("key1").await);
+        cache.put("key1", b"data").await;
+        assert!(cache.exists("key1").await);
+    }
+
+    #[tokio::test]
+    async fn test_overwrite() {
+        let (cache, _dir) = temp_cache().await;
+        cache.put("key1", b"first").await;
+        cache.put("key1", b"second").await;
+        let data = cache.get("key1").await.unwrap();
+        assert_eq!(data, b"second");
+    }
+
+    #[tokio::test]
+    async fn test_creates_directory() {
+        let base = tempfile::tempdir().unwrap();
+        let nested = base.path().join("a").join("b").join("c");
+        let _cache = FileCache::new(nested.clone()).await;
+        assert!(nested.exists());
+    }
+}

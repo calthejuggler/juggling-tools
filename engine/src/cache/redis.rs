@@ -34,3 +34,19 @@ impl RedisCache {
 pub fn fits_in_redis(data: &[u8]) -> bool {
     data.len() <= MAX_REDIS_SIZE
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fits_in_redis_boundary() {
+        let at_limit = vec![0u8; MAX_REDIS_SIZE];
+        assert!(fits_in_redis(&at_limit));
+
+        let over_limit = vec![0u8; MAX_REDIS_SIZE + 1];
+        assert!(!fits_in_redis(&over_limit));
+
+        assert!(fits_in_redis(&[]));
+    }
+}
