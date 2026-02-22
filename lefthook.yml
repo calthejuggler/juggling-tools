@@ -4,13 +4,16 @@ pre-commit:
     lint-web:
       glob: "web/src/**/*.{ts,tsx}"
       run: bunx eslint --fix {staged_files}
+      stage_fixed: true
     lint-server:
       glob: "server/src/**/*.ts"
       run: bunx eslint --fix {staged_files}
+      stage_fixed: true
     format-js:
       glob: "**/*.{ts,tsx,js,json,md}"
       exclude: "engine/**"
       run: bunx prettier --write {staged_files}
+      stage_fixed: true
     format-rust:
       glob: "engine/src/**/*.rs"
       root: engine/
