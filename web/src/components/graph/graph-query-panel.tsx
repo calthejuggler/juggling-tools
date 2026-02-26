@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { GraphsValues } from "@/lib/schemas";
+import type { ViewType } from "@/lib/view-types";
 
 import { QueryForm } from "../query-form";
 
@@ -18,8 +19,8 @@ interface GraphQueryPanelProps {
   onReversedChange: (checked: boolean) => void;
   isFetching: boolean;
   error: Error | null;
-  view: "graph" | "table";
-  onViewChange: (view: "graph" | "table") => void;
+  view: ViewType;
+  onViewChange: (view: ViewType) => void;
 }
 
 export function GraphQueryPanel({

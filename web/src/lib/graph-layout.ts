@@ -1,14 +1,10 @@
 import dagre from "dagre";
 
+import { toBinaryLabel } from "./binary-label";
 import type { ExpandedGraphResponse, GraphApiResponse, GraphEdge, GraphNode } from "./graph-types";
 
 const NODE_WIDTH = 120;
 const NODE_HEIGHT = 40;
-
-function toBinaryLabel(n: number, maxHeight: number, reversed: boolean): string {
-  const binary = n.toString(2).padStart(maxHeight, "0");
-  return reversed ? binary.split("").reverse().join("") : binary;
-}
 
 function expandCompactResponse(data: GraphApiResponse, reversed: boolean): ExpandedGraphResponse {
   const { max_height, nodes, edges, ground_state, ...rest } = data;

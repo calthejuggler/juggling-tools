@@ -8,9 +8,9 @@ import type { TableApiResponse } from "@/lib/table-types";
 import type { ViewType } from "@/lib/view-types";
 
 import { QueryForm } from "../query-form";
-import { StateTable } from "./state-table";
+import { ScatterChartView } from "./scatter-chart-view";
 
-interface StateTableCanvasProps {
+interface ScatterChartCanvasProps {
   data: TableApiResponse | undefined;
   reversed: boolean;
   onReversedChange: (checked: boolean) => void;
@@ -23,7 +23,7 @@ interface StateTableCanvasProps {
   onViewChange: (view: ViewType) => void;
 }
 
-export function StateTableCanvas({
+export function ScatterChartCanvas({
   data,
   reversed,
   onReversedChange,
@@ -34,7 +34,7 @@ export function StateTableCanvas({
   error,
   view,
   onViewChange,
-}: StateTableCanvasProps) {
+}: ScatterChartCanvasProps) {
   return (
     <div className="flex h-full gap-4 p-4">
       <div className="shrink-0">
@@ -58,14 +58,14 @@ export function StateTableCanvas({
         {data ? (
           <Card className="h-full min-h-0 gap-0 overflow-hidden border-0 py-0">
             <CardContent className="h-full min-h-0 overflow-auto px-0">
-              <StateTable data={data} reversed={reversed} />
+              <ScatterChartView data={data} reversed={reversed} />
             </CardContent>
           </Card>
         ) : isFetching ? (
           <div className="flex h-full items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-              <p className="text-muted-foreground text-lg">Loading table...</p>
+              <p className="text-muted-foreground text-lg">Loading scatter chart...</p>
             </div>
           </div>
         ) : null}

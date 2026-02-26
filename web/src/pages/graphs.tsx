@@ -4,9 +4,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { GraphCanvas } from "@/components/graph/graph-canvas";
+import { ScatterChartCanvas } from "@/components/scatter/scatter-chart-canvas";
 import { StateTableCanvas } from "@/components/table/state-table-canvas";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { graphsSchema, type GraphsValues } from "@/lib/schemas";
+import type { ViewType } from "@/lib/view-types";
 import { useGraphQuery } from "@/queries/graphs";
 import { useTableQuery } from "@/queries/table";
 import { Route } from "@/routes/_authed/index";
@@ -41,7 +43,7 @@ export function GraphsPage() {
     data: tableData,
     error: tableError,
     isFetching: tableFetching,
-  } = useTableQuery(submitted, view === "table");
+  } = useTableQuery(submitted, view === "table" || view === "scatter");
 
   const navigateToSearch = useCallback(
     (values: GraphsValues) => {
@@ -64,7 +66,7 @@ export function GraphsPage() {
   }
 
   const handleViewChange = useCallback(
-    (newView: "graph" | "table") => {
+    (newView: ViewType) => {
       navigate({ search: (prev) => ({ ...prev, view: newView }), replace: true });
     },
     [navigate],
@@ -82,6 +84,19 @@ export function GraphsPage() {
           onFieldChange={onFieldChange}
           isFetching={graphFetching}
           error={graphError}
+          view={view}
+          onViewChange={handleViewChange}
+        />
+      ) : view === "scatter" ? (
+        <ScatterChartCanvas
+          data={tableData}
+          reversed={reversed}
+          onReversedChange={handleReversedChange}
+          form={form}
+          onSubmit={onSubmit}
+          onFieldChange={onFieldChange}
+          isFetching={tableFetching}
+          error={tableError}
           view={view}
           onViewChange={handleViewChange}
         />

@@ -6,7 +6,9 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { UI_MAX_HEIGHT, type GraphsValues } from "@/lib/schemas";
+import type { ViewType } from "@/lib/view-types";
 import { useConfigQuery } from "@/queries/config";
 
 interface QueryFormProps {
@@ -17,8 +19,8 @@ interface QueryFormProps {
   onReversedChange: (checked: boolean) => void;
   isFetching: boolean;
   error: Error | null;
-  view: "graph" | "table";
-  onViewChange: (view: "graph" | "table") => void;
+  view: ViewType;
+  onViewChange: (view: ViewType) => void;
 }
 
 export function QueryForm({
@@ -98,16 +100,25 @@ export function QueryForm({
             Reverse notation
           </Label>
         </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            id="view-toggle"
-            size="sm"
-            checked={view === "table"}
-            onCheckedChange={(checked) => onViewChange(checked ? "table" : "graph")}
-          />
-          <Label htmlFor="view-toggle" className="text-xs font-normal">
-            Table view
-          </Label>
+        <div className="space-y-1">
+          <Label className="text-xs font-normal">View</Label>
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(v) => {
+              if (v) onViewChange(v as ViewType);
+            }}
+          >
+            <ToggleGroupItem value="graph" className="flex-1 text-xs">
+              Graph
+            </ToggleGroupItem>
+            <ToggleGroupItem value="table" className="flex-1 text-xs">
+              Table
+            </ToggleGroupItem>
+            <ToggleGroupItem value="scatter" className="flex-1 text-xs">
+              Scatter
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
         {error && (
           <p className="text-destructive text-xs">

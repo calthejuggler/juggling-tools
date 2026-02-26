@@ -14,6 +14,7 @@ import { useGraphLayout } from "@/hooks/use-graph-layout";
 import { useTheme } from "@/hooks/use-theme";
 import type { GraphApiResponse, GraphEdge, GraphNode } from "@/lib/graph-types";
 import type { GraphsValues } from "@/lib/schemas";
+import type { ViewType } from "@/lib/view-types";
 
 import { GraphDetailsPanel } from "./graph-details-panel";
 import { graphNodeTypes } from "./graph-node";
@@ -33,8 +34,8 @@ interface GraphCanvasProps {
   onFieldChange: () => void;
   isFetching: boolean;
   error: Error | null;
-  view: "graph" | "table";
-  onViewChange: (view: "graph" | "table") => void;
+  view: ViewType;
+  onViewChange: (view: ViewType) => void;
 }
 
 export function GraphCanvas({

@@ -9,12 +9,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { toBinaryLabel } from "@/lib/binary-label";
 import type { TableApiResponse } from "@/lib/table-types";
-
-function toBinaryLabel(n: number, maxHeight: number, reversed: boolean): string {
-  const binary = n.toString(2).padStart(maxHeight, "0");
-  return reversed ? binary.split("").reverse().join("") : binary;
-}
 
 interface StateTableProps {
   data: TableApiResponse;
