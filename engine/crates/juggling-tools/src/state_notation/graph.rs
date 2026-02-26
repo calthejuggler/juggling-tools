@@ -1,7 +1,7 @@
 use std::fmt;
 
+use super::compute::compute_transitions;
 use super::state::{MAX_MAX_HEIGHT, State};
-use super::transition::Transition;
 
 /// Parameters for generating a state transition graph or table.
 #[derive(Debug, Clone, Copy)]
@@ -91,31 +91,24 @@ pub struct StateGraph {
 ///
 /// Returns a [`ParamsError`] if the parameters fail validation.
 pub fn compute_graph(params: &Params) -> Result<StateGraph, ParamsError> {
-    params.validate()?;
+    let ts = compute_transitions(params)?;
 
-    let states = State::generate(params.num_props, params.max_height);
-
-    let mut edges = Vec::new();
-    for state in &states {
-        let transitions = Transition::from_state(*state, params.max_height);
-        for t in &transitions {
-            edges.push(Edge {
-                from: t.from(),
-                to: t.to(),
-                throw_height: t.throw_height(),
-            });
-        }
-    }
+    let edges = ts
+        .transitions
+        .iter()
+        .map(|t| Edge {
+            from: t.from(),
+            to: t.to(),
+            throw_height: t.throw_height(),
+        })
+        .collect();
 
     Ok(StateGraph {
-        // State::generate with validated params (num_props <= max_height) always produces
-        // at least one state (the ground state), so index 0 is always valid.
-        #[allow(clippy::indexing_slicing)]
-        ground_state: states[0],
-        states,
+        ground_state: ts.ground_state,
+        states: ts.states,
         edges,
-        num_props: params.num_props,
-        max_height: params.max_height,
+        num_props: ts.num_props,
+        max_height: ts.max_height,
     })
 }
 

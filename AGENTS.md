@@ -83,6 +83,13 @@ Client → Server (validates params, checks ETag) → Engine (3-tier cache: memo
 - `compose.dev.yml`: PostgreSQL + Redis only (for local dev)
 - `compose.yml`: Full production stack (all 5 services, two networks: `public` + `internal`)
 
+## Code Style
+
+### Rust (Engine)
+
+- **Write idiomatic Rust** — always self-review Rust code for idiomatic patterns before presenting. This includes iterator chains over imperative loops, proper use of `Option`/`Result` combinators, clean module import paths (`crate::` re-exports over `super::super::`), appropriate use of ownership/borrowing, etc.
+- **Doc comments for library consumers** — doc comments should describe what a type or function *is* and *does*, not who calls it. Avoid coupling docs to specific internal callers (e.g. "used by X and Y"). Keep them useful to any consumer of the public API.
+
 ## Key Patterns
 
 - **Bun** is the JS runtime and package manager — use `bun install`, `bun run`, not npm/node

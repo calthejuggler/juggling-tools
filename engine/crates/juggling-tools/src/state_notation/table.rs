@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use super::graph::{Params, ParamsError, compute_graph};
+use super::compute::compute_transitions;
+use super::graph::{Params, ParamsError};
 use super::state::State;
 
 /// A state transition table.
@@ -24,47 +25,48 @@ pub struct StateTable {
 
 /// Compute the state transition table for the given parameters.
 ///
-/// Internally calls [`compute_graph`] and reshapes the edges into an N×N matrix.
+/// Builds the N×N matrix directly from the shared [`compute_transitions`] intermediate.
 ///
 /// # Errors
 ///
 /// Returns a [`ParamsError`] if the parameters fail validation.
 pub fn compute_table(params: &Params) -> Result<StateTable, ParamsError> {
-    let graph = compute_graph(params)?;
+    let ts = compute_transitions(params)?;
 
-    let index_map: HashMap<_, _> = graph
+    let index_map: HashMap<_, _> = ts
         .states
         .iter()
         .enumerate()
         .map(|(i, s)| (s.bits(), i))
         .collect();
 
-    let n = graph.states.len();
+    let n = ts.states.len();
     let mut cells = vec![vec![None; n]; n];
 
-    for edge in &graph.edges {
+    for t in &ts.transitions {
         if let (Some(&from_idx), Some(&to_idx)) = (
-            index_map.get(&edge.from.bits()),
-            index_map.get(&edge.to.bits()),
+            index_map.get(&t.from().bits()),
+            index_map.get(&t.to().bits()),
         ) && let Some(row) = cells.get_mut(from_idx)
             && let Some(cell) = row.get_mut(to_idx)
         {
-            *cell = Some(edge.throw_height);
+            *cell = Some(t.throw_height());
         }
     }
 
     Ok(StateTable {
-        states: graph.states,
+        states: ts.states,
         cells,
-        ground_state: graph.ground_state,
-        num_props: graph.num_props,
-        max_height: graph.max_height,
+        ground_state: ts.ground_state,
+        num_props: ts.num_props,
+        max_height: ts.max_height,
     })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::state_notation::compute_graph;
 
     fn params(num_props: u8, max_height: u8) -> Params {
         Params {
