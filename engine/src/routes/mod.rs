@@ -1,6 +1,7 @@
 pub mod graphs;
 mod health;
 pub mod table;
+pub mod throws;
 
 use axum::Router;
 
@@ -15,6 +16,10 @@ pub fn protected() -> Router<AppState> {
         .route(
             "/state-notation/table",
             axum::routing::get(table::get_table_query),
+        )
+        .route(
+            "/state-notation/throws",
+            axum::routing::get(throws::get_throws_query),
         )
 }
 

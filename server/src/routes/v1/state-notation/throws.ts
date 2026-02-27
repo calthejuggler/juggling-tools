@@ -3,19 +3,18 @@ import { Elysia, t } from "elysia";
 import { ENGINE_API_KEY, ENGINE_URL, MAX_MAX_HEIGHT, SCHEMA_VERSION } from "../../../lib/constants";
 import { loggingPlugin } from "../../../lib/logging";
 import { graphRateLimit } from "../../../lib/rate-limit";
-import { ErrorResponse, TableResponse } from "../../../lib/schemas";
+import { ErrorResponse, ThrowsResponse } from "../../../lib/schemas";
 
-const tableQuerySchema = t.Object({
-  num_props: t.Integer({
-    minimum: 1,
-    maximum: MAX_MAX_HEIGHT,
-    description: "Number of props (balls) in the juggling pattern",
-    examples: [3],
+const throwsQuerySchema = t.Object({
+  state: t.Integer({
+    minimum: 0,
+    description: "The state bitmask integer",
+    examples: [7],
   }),
   max_height: t.Integer({
     minimum: 1,
     maximum: MAX_MAX_HEIGHT,
-    description: "Maximum throw height allowed. Must be >= num_props",
+    description: "Maximum throw height allowed",
     examples: [5],
   }),
   compact: t.Optional(
@@ -34,29 +33,29 @@ const tableQuerySchema = t.Object({
   ),
 });
 
-export const tableRoute = new Elysia()
+export const throwsRoute = new Elysia()
   .use(graphRateLimit)
   .use(loggingPlugin)
   .get(
-    "/table",
+    "/throws",
     async ({ query, set, headers, wideEvent }) => {
       if (wideEvent) {
-        wideEvent.num_props = query.num_props;
         wideEvent.max_height = query.max_height;
         wideEvent.compact = query.compact ?? false;
         wideEvent.reversed = query.reversed ?? false;
       }
 
-      if (query.max_height < query.num_props) {
+      if (query.state >= 1 << query.max_height) {
         set.status = 400;
-        if (wideEvent) wideEvent.error_message = "max_height must be >= num_props";
-        return new Response(JSON.stringify({ error: "max_height must be >= num_props" }), {
+        const msg = "state bits exceed max_height";
+        if (wideEvent) wideEvent.error_message = msg;
+        return new Response(JSON.stringify({ error: msg }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      const etag = `"table-v${SCHEMA_VERSION}-${query.num_props}-${query.max_height}-${query.compact ?? false}-${query.reversed ?? false}"`;
+      const etag = `"throws-v${SCHEMA_VERSION}-${query.state}-${query.max_height}-${query.compact ?? false}-${query.reversed ?? false}"`;
 
       if (headers["if-none-match"] === etag) {
         set.status = 304;
@@ -65,7 +64,7 @@ export const tableRoute = new Elysia()
       }
 
       const params = new URLSearchParams({
-        num_props: String(query.num_props),
+        state: String(query.state),
         max_height: String(query.max_height),
         compact: String(query.compact ?? false),
         reversed: String(query.reversed ?? false),
@@ -73,7 +72,7 @@ export const tableRoute = new Elysia()
 
       let engineRes: Response;
       try {
-        engineRes = await fetch(`${ENGINE_URL}/v1/state-notation/table?${params}`, {
+        engineRes = await fetch(`${ENGINE_URL}/v1/state-notation/throws?${params}`, {
           headers: { "X-API-Key": ENGINE_API_KEY },
         });
       } catch {
@@ -105,18 +104,18 @@ export const tableRoute = new Elysia()
       });
     },
     {
-      query: tableQuerySchema,
+      query: throwsQuerySchema,
       response: {
-        200: TableResponse,
+        200: ThrowsResponse,
         304: t.Void({ description: "Not Modified — client cache is still valid" }),
         400: ErrorResponse,
         429: ErrorResponse,
         503: ErrorResponse,
       },
       detail: {
-        summary: "Compute state transition table",
+        summary: "Compute throws from state",
         description:
-          "Computes the siteswap state transition table for the given parameters. " +
+          "Computes all valid throws from the given state within max_height. " +
           "Responses include ETag headers for client-side caching — send If-None-Match to receive 304. " +
           "Rate limited to 30 requests per minute.",
         tags: ["State Notation v1"],

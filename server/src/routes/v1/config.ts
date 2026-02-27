@@ -1,13 +1,6 @@
 import { Elysia } from "elysia";
 
-const STATE_SIZE_TO_MAX: Record<string, number> = {
-  u8: 8,
-  u16: 16,
-  u32: 32,
-  u64: 64,
-  u128: 128,
-};
-const MAX_MAX_HEIGHT = STATE_SIZE_TO_MAX[Bun.env.STATE_SIZE ?? "u32"] ?? 32;
+import { MAX_MAX_HEIGHT } from "../../lib/constants";
 
 export const configRoute = new Elysia().get(
   "/config",

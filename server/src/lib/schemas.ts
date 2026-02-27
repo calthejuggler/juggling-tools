@@ -32,3 +32,18 @@ export const TableResponse = t.Object(
   },
   { description: "State transition table result" },
 );
+
+const ThrowItem = t.Object({
+  height: t.Integer(),
+  destination: t.Union([t.String(), t.Integer()]),
+});
+
+export const ThrowsResponse = t.Object(
+  {
+    throws: t.Array(ThrowItem),
+    state: t.Union([t.String(), t.Integer()]),
+    max_height: t.Integer(),
+    num_throws: t.Integer(),
+  },
+  { description: "Throws computation result" },
+);
