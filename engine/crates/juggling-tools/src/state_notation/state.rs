@@ -38,7 +38,7 @@ pub struct State(Bits);
 
 /// Convert a numeric value to its siteswap character: 0–9 map to `'0'`–`'9'`,
 /// 10–35 map to `'a'`–`'z'`.
-fn siteswap_char(n: u8) -> char {
+const fn siteswap_char(n: u8) -> char {
     match n {
         0..=9 => (b'0' + n) as char,
         10..=35 => (b'a' + n - 10) as char,
