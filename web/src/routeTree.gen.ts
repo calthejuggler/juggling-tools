@@ -19,12 +19,12 @@ const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/signup.lazy').then((d) => d.Route))
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
@@ -33,12 +33,14 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthedRoute,
-} as any)
+} as any).lazy(() => import('./routes/_authed/index.lazy').then((d) => d.Route))
 const AuthedBuilderRoute = AuthedBuilderRouteImport.update({
   id: '/builder',
   path: '/builder',
   getParentRoute: () => AuthedRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_authed/builder.lazy').then((d) => d.Route),
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute

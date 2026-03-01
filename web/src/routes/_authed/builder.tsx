@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { UI_MAX_HEIGHT } from "@/lib/schemas";
-import { BuilderPage } from "@/pages/builder";
 
 const searchSchema = z.object({
   num_props: z.number().int().min(1).max(UI_MAX_HEIGHT).catch(3),
@@ -10,6 +9,5 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/_authed/builder")({
-  component: BuilderPage,
   validateSearch: (search) => searchSchema.parse(search),
 });

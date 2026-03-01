@@ -20,6 +20,24 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/recharts")) {
+            return "vendor-recharts";
+          }
+          if (
+            id.includes("node_modules/@xyflow") ||
+            id.includes("node_modules/dagre") ||
+            id.includes("node_modules/d3-")
+          ) {
+            return "vendor-react-flow";
+          }
+        },
+      },
+    },
+  },
   server: {
     host: "0.0.0.0",
     port: 5173,

@@ -1,17 +1,30 @@
-import { useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { GraphCanvas } from "@/components/graph/graph-canvas";
-import { ScatterChartCanvas } from "@/components/scatter/scatter-chart-canvas";
-import { StateTableCanvas } from "@/components/table/state-table-canvas";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { graphsSchema, type GraphsValues } from "@/lib/schemas";
 import type { ViewType } from "@/lib/view-types";
 import { useGraphQuery } from "@/queries/graphs";
 import { useTableQuery } from "@/queries/table";
 import { Route } from "@/routes/_authed/index";
+
+const GraphCanvas = lazy(() =>
+  import("@/components/graph/graph-canvas").then((m) => ({
+    default: m.GraphCanvas,
+  })),
+);
+const ScatterChartCanvas = lazy(() =>
+  import("@/components/scatter/scatter-chart-canvas").then((m) => ({
+    default: m.ScatterChartCanvas,
+  })),
+);
+const StateTableCanvas = lazy(() =>
+  import("@/components/table/state-table-canvas").then((m) => ({
+    default: m.StateTableCanvas,
+  })),
+);
 
 export function GraphsPage() {
   const { num_props, max_height, view } = Route.useSearch();
@@ -83,52 +96,54 @@ export function GraphsPage() {
 
   return (
     <div className="h-full w-full">
-      {view === "graph" ? (
-        <GraphCanvas
-          data={graphData}
-          reversed={reversed}
-          onReversedChange={handleReversedChange}
-          abbreviated={abbreviated}
-          onAbbreviatedChange={handleAbbreviatedChange}
-          form={form}
-          onSubmit={onSubmit}
-          onFieldChange={onFieldChange}
-          isFetching={graphFetching}
-          error={graphError}
-          view={view}
-          onViewChange={handleViewChange}
-        />
-      ) : view === "scatter" ? (
-        <ScatterChartCanvas
-          data={tableData}
-          reversed={reversed}
-          onReversedChange={handleReversedChange}
-          abbreviated={abbreviated}
-          onAbbreviatedChange={handleAbbreviatedChange}
-          form={form}
-          onSubmit={onSubmit}
-          onFieldChange={onFieldChange}
-          isFetching={tableFetching}
-          error={tableError}
-          view={view}
-          onViewChange={handleViewChange}
-        />
-      ) : (
-        <StateTableCanvas
-          data={tableData}
-          reversed={reversed}
-          onReversedChange={handleReversedChange}
-          abbreviated={abbreviated}
-          onAbbreviatedChange={handleAbbreviatedChange}
-          form={form}
-          onSubmit={onSubmit}
-          onFieldChange={onFieldChange}
-          isFetching={tableFetching}
-          error={tableError}
-          view={view}
-          onViewChange={handleViewChange}
-        />
-      )}
+      <Suspense>
+        {view === "graph" ? (
+          <GraphCanvas
+            data={graphData}
+            reversed={reversed}
+            onReversedChange={handleReversedChange}
+            abbreviated={abbreviated}
+            onAbbreviatedChange={handleAbbreviatedChange}
+            form={form}
+            onSubmit={onSubmit}
+            onFieldChange={onFieldChange}
+            isFetching={graphFetching}
+            error={graphError}
+            view={view}
+            onViewChange={handleViewChange}
+          />
+        ) : view === "scatter" ? (
+          <ScatterChartCanvas
+            data={tableData}
+            reversed={reversed}
+            onReversedChange={handleReversedChange}
+            abbreviated={abbreviated}
+            onAbbreviatedChange={handleAbbreviatedChange}
+            form={form}
+            onSubmit={onSubmit}
+            onFieldChange={onFieldChange}
+            isFetching={tableFetching}
+            error={tableError}
+            view={view}
+            onViewChange={handleViewChange}
+          />
+        ) : (
+          <StateTableCanvas
+            data={tableData}
+            reversed={reversed}
+            onReversedChange={handleReversedChange}
+            abbreviated={abbreviated}
+            onAbbreviatedChange={handleAbbreviatedChange}
+            form={form}
+            onSubmit={onSubmit}
+            onFieldChange={onFieldChange}
+            isFetching={tableFetching}
+            error={tableError}
+            view={view}
+            onViewChange={handleViewChange}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
