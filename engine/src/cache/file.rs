@@ -18,6 +18,25 @@ impl FileCache {
         self.dir.join(key)
     }
 
+    pub async fn clear(&self) {
+        let mut entries = match fs::read_dir(&self.dir).await {
+            Ok(entries) => entries,
+            Err(e) => {
+                tracing::warn!(event = "cache_clear_failed", error = %e, "failed to read cache dir");
+                return;
+            }
+        };
+
+        let mut removed = 0u32;
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            if fs::remove_file(entry.path()).await.is_ok() {
+                removed += 1;
+            }
+        }
+
+        tracing::info!(event = "cache_cleared", removed, "cleared file cache");
+    }
+
     pub async fn get(&self, key: &str) -> Option<Vec<u8>> {
         fs::read(self.path(key)).await.ok()
     }
@@ -83,6 +102,20 @@ mod tests {
         cache.put("key1", b"second").await;
         let data = cache.get("key1").await.unwrap();
         assert_eq!(data, b"second");
+    }
+
+    #[tokio::test]
+    async fn test_clear() {
+        let (cache, _dir) = temp_cache().await;
+        cache.put("key1", b"data1").await;
+        cache.put("key2", b"data2").await;
+        assert!(cache.exists("key1").await);
+        assert!(cache.exists("key2").await);
+
+        cache.clear().await;
+
+        assert!(!cache.exists("key1").await);
+        assert!(!cache.exists("key2").await);
     }
 
     #[tokio::test]

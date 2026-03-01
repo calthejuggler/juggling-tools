@@ -84,6 +84,7 @@ async fn main() {
 
     let precompute_state = app_state.clone();
     tokio::spawn(async move {
+        precompute_state.file_cache.clear().await;
         cache::precompute::precompute(
             &precompute_state.memory_cache,
             precompute_state.redis_cache.as_ref(),
