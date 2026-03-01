@@ -5,6 +5,8 @@ export const graphRateLimit = rateLimit({
   max: 30,
   scoping: "scoped",
   headers: true,
+  generator: (request, server) =>
+    server?.requestIP(request)?.address ?? request.headers.get("x-forwarded-for") ?? "unknown",
   errorResponse: new Response(
     JSON.stringify({ error: "Too many requests, please try again later" }),
     {
