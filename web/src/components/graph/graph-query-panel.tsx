@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { Panel } from "@xyflow/react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -44,10 +44,11 @@ export function GraphQueryPanel({
 
   return (
     <Panel position="top-left">
-      <Card className="w-72 shadow-lg">
+      <Card className="w-80 shadow-lg">
         <div className="flex items-center justify-between px-4 pt-3 pb-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold">{m.query_label()}</span>
+            {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           </div>
           <Button
             variant="ghost"

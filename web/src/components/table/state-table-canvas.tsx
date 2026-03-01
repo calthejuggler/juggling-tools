@@ -50,8 +50,12 @@ export function StateTableCanvas({
   return (
     <div className="flex h-full flex-col gap-2 overflow-auto p-2 md:flex-row md:gap-4 md:overflow-hidden md:p-4">
       <div className="shrink-0">
-        <Card className="w-full shadow-lg md:w-72">
-          <CardContent className="p-3 md:pt-4">
+        <Card className="w-full shadow-lg md:w-80">
+          <CardContent className="space-y-3 p-3 md:pt-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold">{m.query_label()}</span>
+              {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            </div>
             <QueryForm
               form={form}
               onSubmit={onSubmit}

@@ -1,7 +1,5 @@
 import { Controller, type UseFormReturn } from "react-hook-form";
 
-import { Loader2 } from "lucide-react";
-
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +33,6 @@ export function QueryForm({
   onReversedChange,
   abbreviated,
   onAbbreviatedChange,
-  isFetching,
   error,
   view,
   onViewChange,
@@ -44,116 +41,110 @@ export function QueryForm({
   const effectiveMax = config?.max_max_height ?? UI_MAX_HEIGHT;
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold">{m.query_label()}</span>
-        {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <Controller
+          name="num_props"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="num_props">{m.query_props()}</FieldLabel>
+              <Input
+                id="num_props"
+                type="number"
+                min={1}
+                max={effectiveMax}
+                value={field.value}
+                onChange={(e) => {
+                  field.onChange(e.target.valueAsNumber);
+                  onFieldChange();
+                }}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+        <Controller
+          name="max_height"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="max_height">{m.query_max_height()}</FieldLabel>
+              <Input
+                id="max_height"
+                type="number"
+                min={1}
+                max={effectiveMax}
+                value={field.value}
+                onChange={(e) => {
+                  field.onChange(e.target.valueAsNumber);
+                  onFieldChange();
+                }}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
       </div>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          <Controller
-            name="num_props"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="num_props">{m.query_props()}</FieldLabel>
-                <Input
-                  id="num_props"
-                  type="number"
-                  min={1}
-                  max={effectiveMax}
-                  value={field.value}
-                  onChange={(e) => {
-                    field.onChange(e.target.valueAsNumber);
-                    onFieldChange();
-                  }}
-                  onBlur={field.onBlur}
-                  ref={field.ref}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="abbreviated"
+            size="sm"
+            checked={abbreviated}
+            onCheckedChange={onAbbreviatedChange}
           />
-          <Controller
-            name="max_height"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="max_height">{m.query_max_height()}</FieldLabel>
-                <Input
-                  id="max_height"
-                  type="number"
-                  min={1}
-                  max={effectiveMax}
-                  value={field.value}
-                  onChange={(e) => {
-                    field.onChange(e.target.valueAsNumber);
-                    onFieldChange();
-                  }}
-                  onBlur={field.onBlur}
-                  ref={field.ref}
-                  aria-invalid={fieldState.invalid}
-                />
-                <FieldError errors={[fieldState.error]} />
-              </Field>
-            )}
+          <Label htmlFor="abbreviated" className="text-xs font-normal">
+            {m.query_abbreviated()}
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="reversed"
+            size="sm"
+            checked={reversed}
+            onCheckedChange={onReversedChange}
+            disabled={abbreviated}
           />
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Switch
-              id="abbreviated"
-              size="sm"
-              checked={abbreviated}
-              onCheckedChange={onAbbreviatedChange}
-            />
-            <Label htmlFor="abbreviated" className="text-xs font-normal">
-              {m.query_abbreviated()}
-            </Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              id="reversed"
-              size="sm"
-              checked={reversed}
-              onCheckedChange={onReversedChange}
-              disabled={abbreviated}
-            />
-            <Label
-              htmlFor="reversed"
-              className={`text-xs font-normal ${abbreviated ? "text-muted-foreground" : ""}`}
-            >
-              {m.query_reverse()}
-            </Label>
-          </div>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-normal">{m.query_view()}</Label>
-          <ToggleGroup
-            type="single"
-            value={view}
-            onValueChange={(v) => {
-              if (v) onViewChange(v as ViewType);
-            }}
+          <Label
+            htmlFor="reversed"
+            className={`text-xs font-normal ${abbreviated ? "text-muted-foreground" : ""}`}
           >
-            <ToggleGroupItem value="graph" className="flex-1 text-xs">
-              {m.query_view_graph()}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="table" className="flex-1 text-xs">
-              {m.query_view_table()}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="scatter" className="flex-1 text-xs">
-              {m.query_view_scatter()}
-            </ToggleGroupItem>
-          </ToggleGroup>
+            {m.query_reverse()}
+          </Label>
         </div>
-        {error && (
-          <p className="text-destructive text-xs">
-            {error instanceof Error ? error.message : m.query_request_failed()}
-          </p>
-        )}
-      </form>
-    </div>
+      </div>
+      <div className="space-y-1">
+        <Label className="text-xs font-normal">{m.query_view()}</Label>
+        <ToggleGroup
+          type="single"
+          value={view}
+          onValueChange={(v) => {
+            if (v) onViewChange(v as ViewType);
+          }}
+        >
+          <ToggleGroupItem value="graph" className="flex-1 text-xs">
+            {m.query_view_graph()}
+          </ToggleGroupItem>
+          <ToggleGroupItem value="table" className="flex-1 text-xs">
+            {m.query_view_table()}
+          </ToggleGroupItem>
+          <ToggleGroupItem value="scatter" className="flex-1 text-xs">
+            {m.query_view_scatter()}
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+      {error && (
+        <p className="text-destructive text-xs">
+          {error instanceof Error ? error.message : m.query_request_failed()}
+        </p>
+      )}
+    </form>
   );
 }
