@@ -13,7 +13,7 @@ Each juggling state is stored as a 32-bit field where set bits represent future 
 | Frontend | React 19, Vite, TanStack Router + Query, Tailwind CSS 4, Shadcn/Radix UI |
 | Backend  | Elysia.js (Bun), better-auth, Drizzle ORM, PostgreSQL                    |
 | Engine   | Rust, Axum, Tokio with a 3-tier cache (memory / Redis / file)            |
-| i18n     | Paraglide.js (EN, FR, ES, NL, DE)                                        |
+| i18n     | Paraglide.js (EN, FR, ES, NL, DE, ZH)                                    |
 | Infra    | Docker Compose, Caddy                                                    |
 
 ## Prerequisites
