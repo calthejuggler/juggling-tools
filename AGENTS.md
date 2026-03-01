@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Project Overview
 
-Juggling Tools is a full-stack application for querying and visualizing graph data. It's a monorepo with three services:
+Juggling Tools is a full-stack application for computing and exploring siteswap juggling patterns. It's a monorepo with three services:
 
 - **web/** — React frontend (Vite + TanStack Router + Tailwind CSS 4)
 - **server/** — Elysia.js backend API (Bun runtime)
@@ -31,6 +31,7 @@ bun run dev:engine       # Rust engine on :8000 (cargo-watch)
 bun run db:push          # Push schema changes to DB
 bun run db:generate      # Generate migration files
 bun run db:migrate       # Run migrations
+bun run db:seed          # Seed the database
 bun run db:studio        # Visual DB explorer
 
 # Linting & Formatting
@@ -52,8 +53,8 @@ Client → Server (validates params, checks ETag) → Engine (3-tier cache: memo
 ### Server (`server/`)
 
 - **Framework**: Elysia.js on Bun, port 3000
-- **Routes**: `src/routes/v1/` — versioned API (graphs endpoint)
-- **Auth**: better-auth (email/password, sessions) mounted at root
+- **Routes**: `src/routes/v1/` — `state-notation/` (graph, table, throws) + `config`
+- **Auth**: better-auth (email/password, sessions, admin plugin) mounted at root; roles (admin/user), banning, impersonation
 - **DB**: PostgreSQL via Drizzle ORM; schema in `src/db/schema/`; migrations in `drizzle/` and auto-run on startup
 - **Config**: `drizzle.config.ts` for Drizzle Kit; env vars loaded via `bun --env-file=../.env`
 - **Rate limiting**: `src/lib/rate-limit.ts`
@@ -63,19 +64,21 @@ Client → Server (validates params, checks ETag) → Engine (3-tier cache: memo
 - **Framework**: React 19 with React Compiler (babel plugin)
 - **Routing**: TanStack Router (file-based) — routes in `src/routes/`, pages in `src/pages/`
 - **`_authed.tsx`**: Protected route layout wrapper; `__root.tsx`: global layout with devtools
+- **Pages**: graphs (index), siteswap builder, admin panel (user management)
 - **Data fetching**: TanStack React Query
 - **Forms**: React Hook Form + Zod validation (`src/lib/schemas.ts`)
 - **UI components**: Shadcn (Radix UI) in `src/components/ui/`
+- **i18n**: Paraglide.js — messages in `messages/{locale}.json`, config in `project.inlang/settings.json`, runtime in `src/paraglide/`
 - **State**: URL search params (no external state library)
 - **Auth client**: `src/lib/auth-client.ts` (better-auth client)
 
 ### Engine (`engine/`)
 
 - **Framework**: Axum on Tokio, port 8000
-- **Auth**: API key via `X-API-Key` header (public: `/v1/health`, protected: `/v1/graphs`)
-- **Graph computation**: `src/graph.rs`, `src/transition.rs`
+- **Auth**: API key via `X-API-Key` header (public: `/v1/health`, protected: `/v1/state-notation/*`)
+- **Cargo workspace**: engine binary + `crates/juggling-tools` library crate (all computation logic lives in `juggling-tools::state_notation`)
 - **3-tier cache** (`src/cache/`): memory (Moka), Redis, file-based
-- **Shared state**: `src/state.rs` (AppState with cache handles)
+- **Shared state**: `AppState` defined in `src/main.rs`
 - **Logging**: tracing with JSON subscriber; wide-event request middleware in `src/logging.rs`
 
 ### Docker
