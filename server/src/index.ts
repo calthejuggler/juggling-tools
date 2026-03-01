@@ -4,6 +4,7 @@ import { Elysia } from "elysia";
 
 import packageJson from "../package.json";
 import { runMigrations } from "./db";
+import { promoteAdmin } from "./db/promote-admin";
 import { auth } from "./lib/auth";
 import { compressionPlugin } from "./lib/compression";
 import { logger } from "./lib/logger";
@@ -18,6 +19,8 @@ const main = async () => {
     logger.error({ event: "migrations_failed", error: err });
     process.exit(1);
   }
+
+  await promoteAdmin();
 
   logger.info({ event: "cors_config", origin: Bun.env.CORS_ORIGIN ?? "http://localhost:5173" });
 
