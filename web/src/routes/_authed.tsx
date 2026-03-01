@@ -2,15 +2,13 @@ import { createFileRoute, Link, Outlet, redirect, useMatches } from "@tanstack/r
 
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
+import { API_URL } from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: async () => {
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/get-session`,
-      { credentials: "include" },
-    );
+    const res = await fetch(`${API_URL}/api/auth/get-session`, { credentials: "include" });
     if (!res.ok) throw redirect({ to: "/login" });
     const data = await res.json();
     if (!data?.session) throw redirect({ to: "/login" });
