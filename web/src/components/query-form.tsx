@@ -124,18 +124,19 @@ export function QueryForm({
         <Label className="text-xs font-normal">{m.query_view()}</Label>
         <ToggleGroup
           type="single"
+          className="w-full"
           value={view}
           onValueChange={(v) => {
             if (v) onViewChange(v as ViewType);
           }}
         >
-          <ToggleGroupItem value="graph" className="flex-1 text-xs">
+          <ToggleGroupItem value="graph" className="text-xs">
             {m.query_view_graph()}
           </ToggleGroupItem>
-          <ToggleGroupItem value="table" className="flex-1 text-xs">
+          <ToggleGroupItem value="table" className="text-xs">
             {m.query_view_table()}
           </ToggleGroupItem>
-          <ToggleGroupItem value="scatter" className="flex-1 text-xs">
+          <ToggleGroupItem value="scatter" className="text-xs">
             {m.query_view_scatter()}
           </ToggleGroupItem>
         </ToggleGroup>
