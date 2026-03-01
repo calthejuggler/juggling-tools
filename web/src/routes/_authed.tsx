@@ -52,7 +52,7 @@ function AuthedLayout() {
               className={cn(currentPath === "/" && "bg-accent")}
             >
               <Link to="/" search={{ num_props: 3, max_height: 5, view: "graph" }}>
-                Graphs
+                State Graphs
               </Link>
             </Button>
             <Button
@@ -62,7 +62,7 @@ function AuthedLayout() {
               className={cn(currentPath === "/builder" && "bg-accent")}
             >
               <Link to="/builder" search={{ num_props: 3, max_height: 5 }}>
-                Builder
+                Siteswap Builder
               </Link>
             </Button>
             {isAdmin && (
@@ -73,7 +73,7 @@ function AuthedLayout() {
                 className={cn(currentPath.startsWith("/admin") && "bg-accent")}
               >
                 <Link to="/admin" search={{ page: 1, sortBy: "createdAt", sortDirection: "desc" }}>
-                  Admin
+                  Admin Panel
                 </Link>
               </Button>
             )}
