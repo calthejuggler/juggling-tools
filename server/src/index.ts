@@ -5,6 +5,7 @@ import { Elysia } from "elysia";
 import packageJson from "../package.json";
 import { runMigrations } from "./db";
 import { auth } from "./lib/auth";
+import { compressionPlugin } from "./lib/compression";
 import { logger } from "./lib/logger";
 import { loggingPlugin } from "./lib/logging";
 import { routes } from "./routes";
@@ -22,6 +23,7 @@ const main = async () => {
 
   const app = new Elysia()
     .use(cors({ origin: Bun.env.CORS_ORIGIN ?? "http://localhost:5173", credentials: true }))
+    .use(compressionPlugin)
     .use(loggingPlugin)
     .use(
       openapi({
