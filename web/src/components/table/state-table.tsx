@@ -18,6 +18,8 @@ const CHAR_WIDTH = 8.4;
 const CELL_PADDING = 18; // px-2 (16px) + border (2px)
 
 export function StateTable({ data, reversed, abbreviated, scrollElement }: StateTableProps) {
+  "use no memo";
+
   const labels = useMemo(
     () =>
       data.states.map((s) =>
@@ -50,6 +52,7 @@ export function StateTable({ data, reversed, abbreviated, scrollElement }: State
 
   const stickyColWidth = colWidth;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- opted out via "use no memo"
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => scrollElement,
