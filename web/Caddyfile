@@ -11,12 +11,6 @@
 			lb_try_interval 1s
 		}
 	}
-	handle /health {
-		reverse_proxy server:3000 {
-			lb_try_duration 30s
-			lb_try_interval 1s
-		}
-	}
 	handle {
 		root * /srv
 		file_server

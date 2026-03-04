@@ -1,9 +1,10 @@
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
+import { sql } from "drizzle-orm";
 import { Elysia } from "elysia";
 
 import packageJson from "../package.json";
-import { runMigrations } from "./db";
+import { db, runMigrations } from "./db";
 import { promoteAdmin } from "./db/promote-admin";
 import { auth } from "./lib/auth";
 import { compressionPlugin } from "./lib/compression";
@@ -25,6 +26,16 @@ const main = async () => {
   logger.info({ event: "cors_config", origin: Bun.env.CORS_ORIGIN ?? "http://localhost:5173" });
 
   const app = new Elysia()
+    .get("/health", async ({ set }) => {
+      try {
+        await db.execute(sql`SELECT 1`);
+        return "ok";
+      } catch (err) {
+        logger.error({ event: "health_check_failed", error: err });
+        set.status = 503;
+        return "unavailable";
+      }
+    })
     .use(cors({ origin: Bun.env.CORS_ORIGIN ?? "http://localhost:5173", credentials: true }))
     .use(compressionPlugin)
     .use(loggingPlugin)
@@ -195,8 +206,6 @@ const main = async () => {
     )
     .use(routes)
     .mount(auth.handler)
-    .get("/health", () => "ok")
-    .get("/", () => "Hello Elysia")
     .listen(3000);
 
   logger.info({
