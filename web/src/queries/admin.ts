@@ -1,40 +1,50 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { BanUserValues } from "@/lib/admin-schemas";
+import type { AdminSearchValues, BanUserValues } from "@/lib/admin-schemas";
+import { API_URL } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
 import { m } from "@/paraglide/messages.js";
 
-const PAGE_SIZE = 20;
+export const ADMIN_PAGE_SIZE = 20;
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: string;
+  role: "admin" | "user" | null;
+  banned: boolean | null;
+  banReason: string | null;
+  banExpires: string | null;
+  lastLoginAt: string | null;
+}
 
 export const adminQueries = {
   all: () => ["admin"] as const,
   users: () => [...adminQueries.all(), "users"] as const,
-  userList: (params: {
-    search?: string;
-    page: number;
-    sortBy: string;
-    sortDirection: "asc" | "desc";
-  }) =>
+  userList: (params: AdminSearchValues) =>
     queryOptions({
       queryKey: [...adminQueries.users(), params] as const,
       queryFn: async () => {
-        const query: Record<string, string | number> = {
-          limit: PAGE_SIZE,
-          offset: (params.page - 1) * PAGE_SIZE,
+        const searchParams = new URLSearchParams({
+          limit: String(ADMIN_PAGE_SIZE),
+          offset: String((params.page - 1) * ADMIN_PAGE_SIZE),
           sortBy: params.sortBy,
           sortDirection: params.sortDirection,
-        };
+        });
 
         if (params.search) {
-          query.searchValue = params.search;
-          query.searchField = "email";
-          query.searchOperator = "contains";
+          searchParams.set("search", params.search);
         }
 
-        const res = await authClient.admin.listUsers({ query });
-        if (res.error) throw new Error(res.error.message ?? m.admin_failed_list_users());
-        return res.data;
+        const res = await fetch(`${API_URL}/api/v1/admin/users?${searchParams}`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error(m.admin_failed_list_users());
+        return res.json() as Promise<{ users: AdminUser[]; total: number }>;
       },
     }),
   sessions: (userId: string) => [...adminQueries.all(), "sessions", userId] as const,
@@ -48,8 +58,6 @@ export const adminQueries = {
       },
     }),
 };
-
-export { PAGE_SIZE as ADMIN_PAGE_SIZE };
 
 function useInvalidateUsers() {
   const queryClient = useQueryClient();

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import type { AdminSearchValues } from "@/lib/admin-schemas";
 import { useSession } from "@/lib/auth-client";
 import { ADMIN_PAGE_SIZE, adminQueries } from "@/queries/admin";
 import { Route } from "@/routes/_authed/admin/index";
@@ -52,7 +53,7 @@ export function AdminUsersPage() {
     debouncedSearch(e.target.value);
   }
 
-  function handleSort(field: "name" | "email" | "createdAt") {
+  function handleSort(field: SortField) {
     navigate({
       search: (prev) => ({
         ...prev,
@@ -89,7 +90,7 @@ export function AdminUsersPage() {
           ))}
         </div>
       ) : (
-        <>
+        <TooltipProvider>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -110,8 +111,22 @@ export function AdminUsersPage() {
                   >
                     {m.admin_col_email()}
                   </SortableHead>
-                  <TableHead>{m.admin_col_role()}</TableHead>
-                  <TableHead>{m.admin_col_status()}</TableHead>
+                  <SortableHead
+                    field="role"
+                    current={sortBy}
+                    direction={sortDirection}
+                    onClick={handleSort}
+                  >
+                    {m.admin_col_role()}
+                  </SortableHead>
+                  <SortableHead
+                    field="banned"
+                    current={sortBy}
+                    direction={sortDirection}
+                    onClick={handleSort}
+                  >
+                    {m.admin_col_status()}
+                  </SortableHead>
                   <SortableHead
                     field="createdAt"
                     current={sortBy}
@@ -119,6 +134,14 @@ export function AdminUsersPage() {
                     onClick={handleSort}
                   >
                     {m.admin_col_created()}
+                  </SortableHead>
+                  <SortableHead
+                    field="lastLoginAt"
+                    current={sortBy}
+                    direction={sortDirection}
+                    onClick={handleSort}
+                  >
+                    {m.admin_col_last_login()}
                   </SortableHead>
                   <TableHead className="w-24" />
                 </TableRow>
@@ -136,27 +159,25 @@ export function AdminUsersPage() {
                       </TableCell>
                       <TableCell>
                         {user.banned ? (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Badge variant="destructive" className="cursor-default">
-                                  {m.admin_status_banned()}
-                                </Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>
-                                  {user.banExpires
-                                    ? m.admin_ban_until({
-                                        date: new Date(user.banExpires).toLocaleString(),
-                                      })
-                                    : m.admin_ban_permanent()}
-                                </p>
-                                {user.banReason && (
-                                  <p className="text-muted mt-1 italic">{user.banReason}</p>
-                                )}
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="destructive" className="cursor-default">
+                                {m.admin_status_banned()}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {user.banExpires
+                                  ? m.admin_ban_until({
+                                      date: new Date(user.banExpires).toLocaleString(),
+                                    })
+                                  : m.admin_ban_permanent()}
+                              </p>
+                              {user.banReason && (
+                                <p className="text-muted mt-1 italic">{user.banReason}</p>
+                              )}
+                            </TooltipContent>
+                          </Tooltip>
                         ) : (
                           <Badge variant="outline">{m.admin_status_active()}</Badge>
                         )}
@@ -164,11 +185,14 @@ export function AdminUsersPage() {
                       <TableCell className="text-muted-foreground text-sm">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : "—"}
+                      </TableCell>
                       <TableCell>
                         <UserActionsDropdown
                           userId={user.id}
                           userName={user.name}
-                          userRole={(user.role ?? "user") as "admin" | "user"}
+                          userRole={user.role ?? "user"}
                           isBanned={!!user.banned}
                           isSelf={user.id === session?.user?.id}
                         />
@@ -177,7 +201,7 @@ export function AdminUsersPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-muted-foreground text-center">
+                    <TableCell colSpan={7} className="text-muted-foreground text-center">
                       {m.admin_no_users()}
                     </TableCell>
                   </TableRow>
@@ -213,11 +237,13 @@ export function AdminUsersPage() {
               </Button>
             </div>
           </div>
-        </>
+        </TooltipProvider>
       )}
     </div>
   );
 }
+
+type SortField = AdminSearchValues["sortBy"];
 
 function SortableHead({
   field,
@@ -226,10 +252,10 @@ function SortableHead({
   onClick,
   children,
 }: {
-  field: "name" | "email" | "createdAt";
-  current: string;
-  direction: string;
-  onClick: (field: "name" | "email" | "createdAt") => void;
+  field: SortField;
+  current: SortField;
+  direction: "asc" | "desc";
+  onClick: (field: SortField) => void;
   children: React.ReactNode;
 }) {
   return (

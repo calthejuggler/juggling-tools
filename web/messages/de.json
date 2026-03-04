@@ -87,6 +87,7 @@
   "admin_col_role": "Rolle",
   "admin_col_status": "Status",
   "admin_col_created": "Erstellt",
+  "admin_col_last_login": "Letzter Login",
   "admin_status_banned": "Gesperrt",
   "admin_status_active": "Aktiv",
   "admin_ban_until": "Bis {date}",

@@ -87,6 +87,7 @@
   "admin_col_role": "角色",
   "admin_col_status": "状态",
   "admin_col_created": "创建时间",
+  "admin_col_last_login": "最后登录",
   "admin_status_banned": "已封禁",
   "admin_status_active": "活跃",
   "admin_ban_until": "至 {date}",

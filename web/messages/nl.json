@@ -87,6 +87,7 @@
   "admin_col_role": "Rol",
   "admin_col_status": "Status",
   "admin_col_created": "Aangemaakt",
+  "admin_col_last_login": "Laatst ingelogd",
   "admin_status_banned": "Verbannen",
   "admin_status_active": "Actief",
   "admin_ban_until": "Tot {date}",

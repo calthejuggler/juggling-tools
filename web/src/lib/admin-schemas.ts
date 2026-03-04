@@ -3,7 +3,9 @@ import { z } from "zod";
 export const adminSearchSchema = z.object({
   search: z.string().optional().catch(undefined),
   page: z.number().int().min(1).catch(1),
-  sortBy: z.enum(["name", "email", "createdAt"]).catch("createdAt"),
+  sortBy: z
+    .enum(["name", "email", "createdAt", "role", "banned", "lastLoginAt"])
+    .catch("createdAt"),
   sortDirection: z.enum(["asc", "desc"]).catch("desc"),
 });
 
