@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
+  stateGraphOnboardingCompleteAt: timestamp("state_graph_onboarding_complete_at"),
 });
 
 export const sessions = pgTable("sessions", {

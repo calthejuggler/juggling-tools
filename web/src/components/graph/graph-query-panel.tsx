@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 import { Panel } from "@xyflow/react";
-import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, HelpCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +25,7 @@ interface GraphQueryPanelProps {
   error: Error | null;
   view: ViewType;
   onViewChange: (view: ViewType) => void;
+  onHelpClick?: () => void;
 }
 
 export function GraphQueryPanel({
@@ -39,6 +40,7 @@ export function GraphQueryPanel({
   error,
   view,
   onViewChange,
+  onHelpClick,
 }: GraphQueryPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -49,6 +51,17 @@ export function GraphQueryPanel({
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold">{m.query_label()}</span>
             {isFetching && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {onHelpClick && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={onHelpClick}
+                aria-label={m.onboarding_help()}
+              >
+                <HelpCircle className="h-3.5 w-3.5" />
+              </Button>
+            )}
           </div>
           <Button
             variant="ghost"

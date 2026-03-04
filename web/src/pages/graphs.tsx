@@ -2,8 +2,10 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
+import { API_URL } from "@/lib/api";
 import { graphsSchema, type GraphsValues } from "@/lib/schemas";
 import type { ViewType } from "@/lib/view-types";
 import { useGraphQuery } from "@/queries/graphs";
@@ -25,9 +27,16 @@ const StateTableCanvas = lazy(() =>
     default: m.StateTableCanvas,
   })),
 );
+const StateGraphWizard = lazy(() =>
+  import("@/components/onboarding/state-graph-wizard").then((m) => ({
+    default: m.StateGraphWizard,
+  })),
+);
 
 export function GraphsPage() {
   const { num_props, max_height, view } = Route.useSearch();
+  const { session } = useRouteContext({ from: "/_authed" });
+  const router = useRouter();
   const navigate = Route.useNavigate();
 
   const [reversed, setReversed] = useState(
@@ -94,8 +103,36 @@ export function GraphsPage() {
     [navigate],
   );
 
+  const isOnboardingComplete = !!session?.user?.stateGraphOnboardingCompleteAt;
+  const [wizardOpen, setWizardOpen] = useState(!isOnboardingComplete);
+
+  const handleWizardComplete = useCallback(async () => {
+    setWizardOpen(false);
+    try {
+      await fetch(`${API_URL}/api/v1/onboarding/state-graph/complete`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      await router.invalidate();
+    } catch {
+      // Non-critical, wizard will just show again next visit
+    }
+  }, [router]);
+
+  const handleHelpClick = useCallback(() => {
+    setWizardOpen(true);
+  }, []);
+
   return (
     <div className="h-full w-full">
+      <Suspense>
+        <StateGraphWizard
+          open={wizardOpen}
+          onOpenChange={setWizardOpen}
+          onComplete={handleWizardComplete}
+        />
+      </Suspense>
       <Suspense>
         {view === "graph" ? (
           <GraphCanvas
@@ -111,6 +148,7 @@ export function GraphsPage() {
             error={graphError}
             view={view}
             onViewChange={handleViewChange}
+            onHelpClick={handleHelpClick}
           />
         ) : view === "scatter" ? (
           <ScatterChartCanvas

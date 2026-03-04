@@ -22,6 +22,13 @@
       "when": 1772371658558,
       "tag": "0002_giant_magdalene",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772402201347,
+      "tag": "0003_known_dragon_man",
+      "breakpoints": true
     }
   ]
 }

@@ -12,6 +12,15 @@ export const auth = betterAuth({
     usePlural: true,
   }),
   plugins: [admin({ defaultRole: "user" })],
+  user: {
+    additionalFields: {
+      stateGraphOnboardingCompleteAt: {
+        type: "date",
+        required: false,
+        input: false,
+      },
+    },
+  },
   trustedOrigins: [Bun.env.CORS_ORIGIN ?? "http://localhost:5173"],
   trustedProxies: ["127.0.0.1", "::1", "172.16.0.0/12"],
   emailAndPassword: {

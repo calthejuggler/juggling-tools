@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "state_graph_onboarding_complete_at" timestamp;

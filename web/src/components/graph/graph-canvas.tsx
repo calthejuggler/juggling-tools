@@ -8,7 +8,7 @@ import {
   MiniMap,
   ReactFlow,
 } from "@xyflow/react";
-import { AlertCircle, Info, Loader2 } from "lucide-react";
+import { AlertCircle, HelpCircle, Info, Loader2 } from "lucide-react";
 
 import { useIsDesktop } from "@/hooks/use-breakpoint";
 import { PHASE_LABELS, useGraphLayout } from "@/hooks/use-graph-layout";
@@ -45,6 +45,7 @@ interface GraphCanvasProps {
   error: Error | null;
   view: ViewType;
   onViewChange: (view: ViewType) => void;
+  onHelpClick?: () => void;
 }
 
 export function GraphCanvas({
@@ -60,6 +61,7 @@ export function GraphCanvas({
   error,
   view,
   onViewChange,
+  onHelpClick,
 }: GraphCanvasProps) {
   const { theme } = useTheme();
   const { layout, progress } = useGraphLayout(data, reversed, abbreviated);
@@ -83,6 +85,7 @@ export function GraphCanvas({
     error,
     view,
     onViewChange,
+    onHelpClick,
   };
 
   return (
@@ -91,6 +94,18 @@ export function GraphCanvas({
       {!isDesktop && (
         <Card className="m-2">
           <CardContent className="p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-semibold">{m.query_label()}</span>
+              {onHelpClick && (
+                <button
+                  onClick={onHelpClick}
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label={m.onboarding_help()}
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </button>
+              )}
+            </div>
             <QueryForm {...queryFormProps} />
             {data && (
               <div className="text-muted-foreground mt-2 flex gap-4 text-sm">
