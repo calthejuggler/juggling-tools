@@ -1,6 +1,7 @@
 FROM rust:1.93-alpine AS chef
-RUN apk add --no-cache musl-dev
-RUN cargo install cargo-chef
+RUN apk add --no-cache musl-dev xz && \
+    wget -qO- https://github.com/LukeMathWalker/cargo-chef/releases/latest/download/cargo-chef-x86_64-unknown-linux-musl.tar.xz \
+    | tar xJ -C /usr/local/cargo/bin/ --strip-components=1
 WORKDIR /app
 
 FROM chef AS planner
