@@ -3,22 +3,26 @@ import { Elysia, t } from "elysia";
 
 import { db } from "../../db";
 import { sessions, users } from "../../db/schema/auth";
-import { auth } from "../../lib/auth";
+import { jsonError } from "../../lib/json-error";
+import { loggingPlugin } from "../../lib/logging";
+import { requireSession } from "../../lib/require-auth";
 
 const SORT_FIELDS = ["name", "email", "createdAt", "role", "banned", "lastLoginAt"] as const;
 type SortField = (typeof SORT_FIELDS)[number];
 
-export const adminRoutes = new Elysia({ prefix: "/admin" }).get(
+export const adminRoutes = new Elysia({ prefix: "/admin" }).use(loggingPlugin).get(
   "/users",
-  async ({ query, request, set }) => {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session) {
+  async ({ query, request, set, wideEvent }) => {
+    const auth = await requireSession(request, wideEvent);
+    if (!auth.ok) {
       set.status = 401;
-      return { error: "Unauthorized" };
+      return auth.response;
     }
-    if (session.user.role !== "admin") {
+
+    if (auth.session.user.role !== "admin") {
       set.status = 403;
-      return { error: "Forbidden" };
+      wideEvent.error_message = "Forbidden";
+      return jsonError(403, "Forbidden");
     }
 
     const limit = query.limit ?? 20;

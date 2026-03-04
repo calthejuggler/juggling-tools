@@ -11,6 +11,8 @@ export type WideEvent = {
   engine_status?: number;
   error_code?: string;
   error_message?: string;
+  user_id?: string;
+  user_role?: string;
 };
 
 export const loggingPlugin = new Elysia({ name: "logging" })

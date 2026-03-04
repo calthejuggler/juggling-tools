@@ -5,6 +5,7 @@ export function createLogger(baseFields?: BaseFields) {
     service: "server",
     version: Bun.env.npm_package_version ?? "unknown",
     environment: Bun.env.NODE_ENV ?? "development",
+    commit_sha: Bun.env.COMMIT_SHA ?? "unknown",
     ...baseFields,
   };
 

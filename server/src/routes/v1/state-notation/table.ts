@@ -1,8 +1,11 @@
 import { Elysia, t } from "elysia";
 
-import { ENGINE_API_KEY, ENGINE_URL, MAX_MAX_HEIGHT, SCHEMA_VERSION } from "../../../lib/constants";
+import { MAX_MAX_HEIGHT, SCHEMA_VERSION } from "../../../lib/constants";
+import { fetchEngine } from "../../../lib/engine";
+import { jsonError } from "../../../lib/json-error";
 import { loggingPlugin } from "../../../lib/logging";
 import { graphRateLimit } from "../../../lib/rate-limit";
+import { requireSession } from "../../../lib/require-auth";
 import { ErrorResponse, TableResponse } from "../../../lib/schemas";
 
 const tableQuerySchema = t.Object({
@@ -39,28 +42,29 @@ export const tableRoute = new Elysia()
   .use(loggingPlugin)
   .get(
     "/table",
-    async ({ query, set, headers, wideEvent }) => {
-      if (wideEvent) {
-        wideEvent.num_props = query.num_props;
-        wideEvent.max_height = query.max_height;
-        wideEvent.compact = query.compact ?? false;
-        wideEvent.reversed = query.reversed ?? false;
-      }
+    async ({ query, set, headers, wideEvent, request, requestContext }) => {
+      wideEvent.num_props = query.num_props;
+      wideEvent.max_height = query.max_height;
+      wideEvent.compact = query.compact ?? false;
+      wideEvent.reversed = query.reversed ?? false;
 
       if (query.max_height < query.num_props) {
         set.status = 400;
-        if (wideEvent) wideEvent.error_message = "max_height must be >= num_props";
-        return new Response(JSON.stringify({ error: "max_height must be >= num_props" }), {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        });
+        wideEvent.error_message = "max_height must be >= num_props";
+        return jsonError(400, "max_height must be >= num_props");
+      }
+
+      const auth = await requireSession(request, wideEvent);
+      if (!auth.ok) {
+        set.status = 401;
+        return auth.response;
       }
 
       const etag = `"table-v${SCHEMA_VERSION}-${query.num_props}-${query.max_height}-${query.compact ?? false}-${query.reversed ?? false}"`;
 
       if (headers["if-none-match"] === etag) {
         set.status = 304;
-        if (wideEvent) wideEvent.cache_hit = "client";
+        wideEvent.cache_hit = "client";
         return new Response(null, { status: 304 });
       }
 
@@ -71,32 +75,13 @@ export const tableRoute = new Elysia()
         reversed: String(query.reversed ?? false),
       });
 
-      let engineRes: Response;
-      try {
-        engineRes = await fetch(`${ENGINE_URL}/v1/state-notation/table?${params}`, {
-          headers: { "X-API-Key": ENGINE_API_KEY },
-        });
-      } catch {
-        set.status = 503;
-        if (wideEvent) wideEvent.error_message = "Engine unavailable";
-        return new Response(JSON.stringify({ error: "Engine unavailable" }), {
-          status: 503,
-          headers: { "Content-Type": "application/json" },
-        });
+      const engine = await fetchEngine("table", params, requestContext.requestId, wideEvent);
+      if (!engine.ok) {
+        set.status = engine.response.status;
+        return engine.response;
       }
 
-      if (wideEvent) wideEvent.engine_status = engineRes.status;
-
-      if (!engineRes.ok) {
-        set.status = engineRes.status;
-        if (wideEvent) wideEvent.error_message = `Engine returned ${engineRes.status}`;
-        return new Response(await engineRes.text(), {
-          status: engineRes.status,
-          headers: { "Content-Type": "text/plain" },
-        });
-      }
-
-      return new Response(engineRes.body, {
+      return new Response(engine.response.body, {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "public, no-cache",
@@ -110,6 +95,7 @@ export const tableRoute = new Elysia()
         200: TableResponse,
         304: t.Void({ description: "Not Modified — client cache is still valid" }),
         400: ErrorResponse,
+        401: ErrorResponse,
         429: ErrorResponse,
         503: ErrorResponse,
       },

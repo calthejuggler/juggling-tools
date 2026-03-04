@@ -19,10 +19,16 @@ pub struct WideEvent {
 pub type WideEventHandle = Arc<Mutex<WideEvent>>;
 
 pub async fn wide_event_middleware(mut req: Request, next: Next) -> Response {
-    let request_id = uuid::Uuid::new_v4().to_string();
+    let request_id = req
+        .headers()
+        .get("x-request-id")
+        .and_then(|v| v.to_str().ok())
+        .map(String::from)
+        .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let method = req.method().to_string();
     let path = req.uri().path().to_string();
     let query = req.uri().query().unwrap_or("").to_string();
+    let commit_sha = option_env!("COMMIT_SHA").unwrap_or("unknown");
     let start = Instant::now();
 
     let wide_event: WideEventHandle = Arc::new(Mutex::new(WideEvent::default()));
@@ -39,6 +45,7 @@ pub async fn wide_event_middleware(mut req: Request, next: Next) -> Response {
         tracing::error!(
             service = "engine",
             version = env!("CARGO_PKG_VERSION"),
+            commit_sha,
             request_id,
             method,
             path,
@@ -58,6 +65,7 @@ pub async fn wide_event_middleware(mut req: Request, next: Next) -> Response {
         tracing::info!(
             service = "engine",
             version = env!("CARGO_PKG_VERSION"),
+            commit_sha,
             request_id,
             method,
             path,
