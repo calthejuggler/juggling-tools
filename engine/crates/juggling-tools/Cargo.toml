@@ -19,6 +19,10 @@ state-u64 = []
 state-u128 = []
 # Default (no state-* feature) = u32
 
+[[bin]]
+name = "bench"
+path = "src/bin/bench.rs"
+
 [lints.rust]
 unsafe_code = "forbid"
 missing_docs = "deny"

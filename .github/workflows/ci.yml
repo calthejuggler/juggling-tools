@@ -220,6 +220,184 @@ jobs:
           build-args: ${{ matrix.image == 'engine' && 'STATE_SIZE=u32' || format('BUN_VERSION={0}', steps.bun-version.outputs.version) }}
           cache-from: type=gha,scope=${{ matrix.scope }}
 
+  engine-bench:
+    name: Engine Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    needs: [engine-check]
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      BENCH_THRESHOLD: 15
+    defaults:
+      run:
+        shell: bash
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "engine -> target"
+
+      - name: Install hyperfine
+        working-directory: /tmp
+        run: |
+          HYPERFINE_VERSION="1.19.0"
+          curl -sSfL "https://github.com/sharkdp/hyperfine/releases/download/v${HYPERFINE_VERSION}/hyperfine-v${HYPERFINE_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+            | tar xz
+          sudo cp "hyperfine-v${HYPERFINE_VERSION}-x86_64-unknown-linux-musl/hyperfine" /usr/local/bin/
+
+      - name: Determine base ref
+        id: base
+        working-directory: .
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          NULL_SHA="0000000000000000000000000000000000000000"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="$PR_BASE_SHA"
+          else
+            BASE_SHA="$PUSH_BEFORE_SHA"
+          fi
+          if [ "$BASE_SHA" = "$NULL_SHA" ] || [ -z "$BASE_SHA" ]; then
+            echo "::notice::No valid base commit — skipping benchmark comparison"
+            echo "sha=" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build current binary
+        run: cargo build --release -p juggling-tools --bin bench
+
+      - name: Build base binary
+        id: build-base
+        if: steps.base.outputs.sha != ''
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: |
+          git worktree add /tmp/base "$BASE_SHA"
+
+          mkdir -p /tmp/base/engine/crates/juggling-tools/src/bin
+          cp crates/juggling-tools/src/bin/bench.rs /tmp/base/engine/crates/juggling-tools/src/bin/bench.rs
+          cp crates/juggling-tools/Cargo.toml /tmp/base/engine/crates/juggling-tools/Cargo.toml
+
+          if cargo build --release \
+            --manifest-path /tmp/base/engine/Cargo.toml \
+            -p juggling-tools --bin bench \
+            --target-dir /tmp/base-target; then
+            cp /tmp/base-target/release/bench /tmp/jt-bench-base
+            echo "base-built=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Base binary failed to build — skipping benchmark comparison"
+            echo "base-built=false" >> "$GITHUB_OUTPUT"
+          fi
+          git worktree remove /tmp/base --force
+
+      - name: Run benchmarks
+        if: steps.build-base.outputs.base-built == 'true'
+        working-directory: .
+        run: |
+          CURRENT="engine/target/release/bench"
+
+          declare -a LABELS=("small" "medium" "large")
+          declare -a PARAMS=("3 9 500" "5 12 50" "7 15 5")
+
+          for i in 0 1 2; do
+            LABEL="${LABELS[$i]}"
+            P="${PARAMS[$i]}"
+            echo "::group::Benchmark: $LABEL ($P)"
+            hyperfine \
+              --warmup 3 \
+              --min-runs 5 \
+              --export-json "/tmp/bench-${LABEL}.json" \
+              -n base "/tmp/jt-bench-base $P" \
+              -n current "$CURRENT $P"
+            echo "::endgroup::"
+          done
+
+      - name: Parse results and check for regressions
+        if: steps.build-base.outputs.base-built == 'true'
+        id: results
+        working-directory: .
+        run: |
+          REGRESSION=false
+          OUTFILE="/tmp/bench-summary.md"
+
+          printf '%s\n' "## ⚡ Engine Benchmark" "" \
+            "| Workload | Base | Current | Change |" \
+            "|----------|------|---------|--------|" > "$OUTFILE"
+
+          declare -a LABELS=("small" "medium" "large")
+          declare -a DESCS=("3,9" "5,12" "7,15")
+
+          for i in 0 1 2; do
+            LABEL="${LABELS[$i]}"
+            DESC="${DESCS[$i]}"
+            JSON="/tmp/bench-${LABEL}.json"
+
+            BASE_MEAN=$(jq -e '.results[0].mean' "$JSON") || { echo "::error::Failed to parse base mean from $JSON"; exit 1; }
+            CURRENT_MEAN=$(jq -e '.results[1].mean' "$JSON") || { echo "::error::Failed to parse current mean from $JSON"; exit 1; }
+
+            BASE_MS=$(echo "$BASE_MEAN" | awk '{printf "%.2f", $1 * 1000}')
+            CURRENT_MS=$(echo "$CURRENT_MEAN" | awk '{printf "%.2f", $1 * 1000}')
+            PCT=$(echo "$BASE_MEAN $CURRENT_MEAN" | awk '{printf "%.1f", (($2 - $1) / $1) * 100}')
+
+            if echo "$PCT" | grep -q '^-'; then
+              SIGN=""
+              EMOJI="✅"
+            else
+              SIGN="+"
+              IS_ABOVE=$(echo "$PCT $BENCH_THRESHOLD" | awk '{print ($1 > $2) ? "yes" : "no"}')
+              if [ "$IS_ABOVE" = "yes" ]; then
+                EMOJI="🔴"
+                REGRESSION=true
+              else
+                EMOJI="✅"
+              fi
+            fi
+
+            echo "| ${LABEL} (${DESC}) | ${BASE_MS} ms | ${CURRENT_MS} ms | ${SIGN}${PCT}% ${EMOJI} |" >> "$OUTFILE"
+          done
+
+          echo "" >> "$OUTFILE"
+          if [ "$REGRESSION" = "true" ]; then
+            echo "> 🔴 **Regression detected** — one or more workloads exceeded the ${BENCH_THRESHOLD}% threshold" >> "$OUTFILE"
+          else
+            echo "> ✅ No regressions detected (threshold: ${BENCH_THRESHOLD}%)" >> "$OUTFILE"
+          fi
+
+          cat "$OUTFILE" >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "comment<<BENCH_EOF"
+            cat "$OUTFILE"
+            echo "BENCH_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "regression=$REGRESSION" >> "$GITHUB_OUTPUT"
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && steps.results.outputs.comment != ''
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: ${{ steps.results.outputs.comment }}
+          comment-tag: engine-benchmark
+
+      - name: Fail on regression
+        if: steps.results.outputs.regression == 'true'
+        run: |
+          echo "::warning::Performance regression detected (>${BENCH_THRESHOLD}% slower)"
+          exit 1
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
