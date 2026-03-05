@@ -2,7 +2,7 @@
 	handle /api/* {
 		reverse_proxy server:3000
 	}
-	handle /openapi/* {
+	handle /openapi* {
 		reverse_proxy server:3000
 	}
 	handle /health {
