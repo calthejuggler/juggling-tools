@@ -8,6 +8,19 @@ import { m } from "@/paraglide/messages.js";
 
 export const ADMIN_PAGE_SIZE = 20;
 
+export async function fetchBanInfo(
+  email: string,
+): Promise<{ reason: string | null; expires: string | null } | null> {
+  const res = await fetch(`${API_URL}/api/v1/admin/ban-info`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.banned ? { reason: data.banReason, expires: data.banExpires } : null;
+}
+
 interface AdminUser {
   id: string;
   name: string;

@@ -9,6 +9,7 @@ import { FormField } from "@/components/form-field";
 import { Button } from "@/components/ui/button";
 import { authClient, signIn } from "@/lib/auth-client";
 import { loginSchema, type LoginValues } from "@/lib/schemas";
+import { fetchBanInfo } from "@/queries/admin";
 import { GRAPH_SEARCH } from "@/routes/_authed";
 
 import { m } from "@/paraglide/messages.js";
@@ -16,6 +17,10 @@ import { m } from "@/paraglide/messages.js";
 export function LoginPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState("");
+  const [banInfo, setBanInfo] = useState<{
+    reason: string | null;
+    expires: string | null;
+  } | null>(null);
   const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [showResend, setShowResend] = useState(false);
 
@@ -26,12 +31,21 @@ export function LoginPage() {
 
   async function onSubmit(values: LoginValues) {
     setServerError("");
+    setBanInfo(null);
     setShowResend(false);
     try {
       const res = await signIn.email(values);
       if (res.error) {
         if (res.error.code === "EMAIL_NOT_VERIFIED") {
           setShowResend(true);
+        } else if (res.error.code === "BANNED_USER") {
+          setServerError(m.auth_banned_message());
+          try {
+            const info = await fetchBanInfo(values.email);
+            if (info) setBanInfo(info);
+          } catch {
+            // Best-effort
+          }
         } else {
           setServerError(res.error.message ?? m.auth_login_failed());
         }
@@ -82,9 +96,21 @@ export function LoginPage() {
           autoComplete="current-password"
         />
         {serverError && (
-          <p role="alert" className="text-destructive text-sm">
-            {serverError}
-          </p>
+          <div role="alert" className="text-destructive space-y-1 text-sm">
+            <p>{serverError}</p>
+            {banInfo?.reason && <p>{m.auth_banned_reason({ reason: banInfo.reason })}</p>}
+            {banInfo && (
+              <p>
+                {banInfo.expires
+                  ? m.auth_banned_expires({
+                      date: new Date(banInfo.expires).toLocaleDateString(undefined, {
+                        dateStyle: "long",
+                      }),
+                    })
+                  : m.auth_banned_permanent()}
+              </p>
+            )}
+          </div>
         )}
         {showResend && (
           <div className="space-y-2">
