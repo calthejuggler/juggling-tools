@@ -14,6 +14,8 @@ export type WideEvent = {
   ban_info_result?: string;
   user_id?: string;
   user_role?: string;
+  contact_name?: string;
+  contact_email?: string;
 };
 
 export const loggingPlugin = new Elysia({ name: "logging" })

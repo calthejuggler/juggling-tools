@@ -77,3 +77,13 @@ export type GraphsValues = z.infer<ReturnType<typeof graphsSchema>>;
 export const builderSchema = graphsSchema;
 
 export type BuilderValues = GraphsValues;
+
+export function contactSchema() {
+  return z.object({
+    name: z.string().min(1, m.validation_name_required()).max(100),
+    email: z.email(m.validation_invalid_email()).max(254),
+    message: z.string().min(1, m.contact_validation_message_required()).max(5000),
+  });
+}
+
+export type ContactValues = z.infer<ReturnType<typeof contactSchema>>;

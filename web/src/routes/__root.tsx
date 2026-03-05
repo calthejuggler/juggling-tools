@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 
+import { FooterPanel } from "@/components/footer-panel";
 import { initI18n } from "@/lib/i18n";
 import { queryClient } from "@/lib/query-client";
 
@@ -33,6 +34,7 @@ function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <div className="bg-background text-foreground min-h-screen">
         <Outlet />
+        <FooterPanel />
       </div>
       <Suspense>
         <ReactQueryDevtools initialIsOpen={false} />

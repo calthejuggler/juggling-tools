@@ -1,7 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
-  "app_name": "杂耍工具",
+  "app_name": "Juggling Tools",
 
   "auth_sign_in": "登录",
   "auth_signing_in": "登录中...",
@@ -239,5 +239,23 @@
   "onboarding_graph_trace_pattern": "追踪 {pattern}",
   "onboarding_graph_replay_trace": "重播",
   "onboarding_help": "了解状态图",
-  "onboarding_throws_locked": "完成测验以解锁"
+  "onboarding_throws_locked": "完成测验以解锁",
+
+  "footer_github": "GitHub",
+  "footer_contact": "联系我们",
+  "contact_title": "有问题或反馈？",
+  "contact_description": "我们很乐意听取你的意见。发送消息，我们会尽快回复。",
+  "contact_name_label": "姓名",
+  "contact_name_placeholder": "你的名字",
+  "contact_email_label": "邮箱",
+  "contact_email_placeholder": "you@example.com",
+  "contact_message_label": "消息",
+  "contact_message_placeholder": "你在想什么？",
+  "contact_send": "发送消息",
+  "contact_sending": "发送中...",
+  "contact_success": "感谢你的留言！我们会尽快回复。",
+  "contact_error": "出了点问题，请重试。",
+  "contact_validation_message_required": "请输入消息",
+  "contact_custom_title": "需要定制软件解决方案？",
+  "contact_custom_description": "我开发网页应用、API 等各类项目。欢迎联系！"
 }

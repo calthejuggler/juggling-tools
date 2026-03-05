@@ -239,5 +239,23 @@
   "onboarding_graph_trace_pattern": "{pattern} verfolgen",
   "onboarding_graph_replay_trace": "Wiederholen",
   "onboarding_help": "Über Zustandsgraphen lernen",
-  "onboarding_throws_locked": "Quiz abschließen zum Freischalten"
+  "onboarding_throws_locked": "Quiz abschließen zum Freischalten",
+
+  "footer_github": "GitHub",
+  "footer_contact": "Kontakt",
+  "contact_title": "Fragen oder Feedback?",
+  "contact_description": "Wir freuen uns von dir zu hören. Schick uns eine Nachricht und wir melden uns bei dir.",
+  "contact_name_label": "Name",
+  "contact_name_placeholder": "Dein Name",
+  "contact_email_label": "E-Mail",
+  "contact_email_placeholder": "du@beispiel.de",
+  "contact_message_label": "Nachricht",
+  "contact_message_placeholder": "Was hast du auf dem Herzen?",
+  "contact_send": "Nachricht senden",
+  "contact_sending": "Wird gesendet...",
+  "contact_success": "Danke für deine Nachricht! Wir melden uns bei dir.",
+  "contact_error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+  "contact_validation_message_required": "Nachricht ist erforderlich",
+  "contact_custom_title": "Brauchst du eine individuelle Softwarelösung?",
+  "contact_custom_description": "Ich entwickle Webanwendungen, APIs und vieles mehr. Melde dich bei mir!"
 }

@@ -238,6 +238,24 @@
   "onboarding_graph_props_note": "Getoond met 2 ballen, max hoogte 3 ter vereenvoudiging.",
   "onboarding_graph_trace_pattern": "{pattern} volgen",
   "onboarding_graph_replay_trace": "Opnieuw",
-  "onboarding_help": "Leer over toestandsgrafieken",
-  "onboarding_throws_locked": "Voltooi de quiz om te ontgrendelen"
+  "onboarding_help": "Leer over toestandsgrafen",
+  "onboarding_throws_locked": "Voltooi de quiz om te ontgrendelen",
+
+  "footer_github": "GitHub",
+  "footer_contact": "Contact",
+  "contact_title": "Vragen of feedback?",
+  "contact_description": "We horen graag van je. Stuur ons een bericht en we nemen contact met je op.",
+  "contact_name_label": "Naam",
+  "contact_name_placeholder": "Je naam",
+  "contact_email_label": "E-mailadres",
+  "contact_email_placeholder": "jij@voorbeeld.nl",
+  "contact_message_label": "Bericht",
+  "contact_message_placeholder": "Waar denk je aan?",
+  "contact_send": "Bericht versturen",
+  "contact_sending": "Versturen...",
+  "contact_success": "Bedankt voor je bericht! We nemen contact met je op.",
+  "contact_error": "Er is iets misgegaan. Probeer het opnieuw.",
+  "contact_validation_message_required": "Bericht is verplicht",
+  "contact_custom_title": "Op zoek naar een maatwerkoplossing?",
+  "contact_custom_description": "Ik bouw webapplicaties, API's en nog veel meer. Neem contact op!"
 }

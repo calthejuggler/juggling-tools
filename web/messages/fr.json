@@ -239,5 +239,23 @@
   "onboarding_graph_trace_pattern": "Tracer {pattern}",
   "onboarding_graph_replay_trace": "Rejouer",
   "onboarding_help": "En savoir plus sur les graphes d'état",
-  "onboarding_throws_locked": "Complétez le quiz pour débloquer"
+  "onboarding_throws_locked": "Complétez le quiz pour débloquer",
+
+  "footer_github": "GitHub",
+  "footer_contact": "Contact",
+  "contact_title": "Questions ou commentaires ?",
+  "contact_description": "Nous serions ravis de vous entendre. Envoyez-nous un message et nous vous répondrons.",
+  "contact_name_label": "Nom",
+  "contact_name_placeholder": "Votre nom",
+  "contact_email_label": "E-mail",
+  "contact_email_placeholder": "vous@exemple.com",
+  "contact_message_label": "Message",
+  "contact_message_placeholder": "Qu'avez-vous en tête ?",
+  "contact_send": "Envoyer le message",
+  "contact_sending": "Envoi en cours...",
+  "contact_success": "Merci pour votre message ! Nous vous répondrons bientôt.",
+  "contact_error": "Une erreur s'est produite. Veuillez réessayer.",
+  "contact_validation_message_required": "Le message est requis",
+  "contact_custom_title": "Besoin d'une solution logicielle sur mesure ?",
+  "contact_custom_description": "Je développe des applications web, des API et bien plus encore. Contactez-moi !"
 }

@@ -239,5 +239,23 @@
   "onboarding_graph_trace_pattern": "Trace {pattern}",
   "onboarding_graph_replay_trace": "Replay",
   "onboarding_help": "Learn about state graphs",
-  "onboarding_throws_locked": "Complete the quiz to unlock"
+  "onboarding_throws_locked": "Complete the quiz to unlock",
+
+  "footer_github": "GitHub",
+  "footer_contact": "Contact",
+  "contact_title": "Questions or feedback?",
+  "contact_description": "We'd love to hear from you. Send us a message and we'll get back to you.",
+  "contact_name_label": "Name",
+  "contact_name_placeholder": "Your name",
+  "contact_email_label": "Email",
+  "contact_email_placeholder": "you@example.com",
+  "contact_message_label": "Message",
+  "contact_message_placeholder": "What's on your mind?",
+  "contact_send": "Send message",
+  "contact_sending": "Sending...",
+  "contact_success": "Thanks for your message! We'll be in touch.",
+  "contact_error": "Something went wrong. Please try again.",
+  "contact_validation_message_required": "Message is required",
+  "contact_custom_title": "Need a custom software solution?",
+  "contact_custom_description": "I build full-stack web applications, APIs, and more. Get in touch!"
 }
