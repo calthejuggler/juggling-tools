@@ -93,7 +93,7 @@ export const graphRoute = new Elysia()
       query: graphQuerySchema,
       response: {
         200: GraphResponse,
-        304: t.Void({ description: "Not Modified — client cache is still valid" }),
+        304: t.Void({ description: "Not Modified: client cache is still valid" }),
         400: ErrorResponse,
         401: ErrorResponse,
         429: ErrorResponse,
@@ -103,7 +103,7 @@ export const graphRoute = new Elysia()
         summary: "Compute juggling graph",
         description:
           "Computes the siteswap state graph for the given parameters. " +
-          "Responses include ETag headers for client-side caching — send If-None-Match to receive 304. " +
+          "Responses include ETag headers for client-side caching. Send If-None-Match to receive 304. " +
           "Rate limited to 30 requests per minute.",
         tags: ["State Notation v1"],
       },

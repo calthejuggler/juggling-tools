@@ -30,6 +30,7 @@ const main = async () => {
     .use(loggingPlugin)
     .use(
       openapi({
+        path: "/openapi",
         documentation: {
           info: {
             title: "Juggling Tools API",

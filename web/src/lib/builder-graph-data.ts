@@ -9,7 +9,7 @@ export function builderStateToGraphData(
 ): GraphApiResponse {
   const nodes = Array.from(state.visitedStates);
 
-  // Deduplicate edges — same from/to/throw only appears once
+  // Deduplicate edges: same from/to/throw only appears once
   const edgeMap = new Map<string, { from: number; to: number; throw_height: number }>();
   for (const step of state.steps) {
     const key = `${step.state}-${step.destination}-${step.throwHeight}`;

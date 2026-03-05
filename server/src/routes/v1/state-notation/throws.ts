@@ -92,7 +92,7 @@ export const throwsRoute = new Elysia()
       query: throwsQuerySchema,
       response: {
         200: ThrowsResponse,
-        304: t.Void({ description: "Not Modified — client cache is still valid" }),
+        304: t.Void({ description: "Not Modified: client cache is still valid" }),
         400: ErrorResponse,
         401: ErrorResponse,
         429: ErrorResponse,
@@ -102,7 +102,7 @@ export const throwsRoute = new Elysia()
         summary: "Compute throws from state",
         description:
           "Computes all valid throws from the given state within max_height. " +
-          "Responses include ETag headers for client-side caching — send If-None-Match to receive 304. " +
+          "Responses include ETag headers for client-side caching. Send If-None-Match to receive 304. " +
           "Rate limited to 30 requests per minute.",
         tags: ["State Notation v1"],
       },

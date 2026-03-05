@@ -135,7 +135,7 @@ async function main() {
   const hasCargoWatch = cargoWatch.exitCode === 0;
 
   if (!hasCargoWatch) {
-    log("engine", "cargo-watch not found — using `cargo run` (no auto-reload)");
+    log("engine", "cargo-watch not found, using `cargo run` (no auto-reload)");
     log("engine", "Install it with: cargo install cargo-watch");
   }
 
