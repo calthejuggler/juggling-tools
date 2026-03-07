@@ -1,3 +1,4 @@
+import { effectiveHeight } from "./physics.js";
 import type { BallPosition } from "./physics.js";
 import type { Vec2 } from "./types.js";
 
@@ -7,19 +8,20 @@ const NECK_TO_SHOULDER_RATIO = 0.03;
 const WAIST_Y_RATIO = 1.05;
 const SHOULDER_WIDTH_RATIO = 0.14;
 const JUGGLER_LINE_WIDTH = 2.5;
-const JUGGLER_STROKE_STYLE = "rgba(255, 255, 255, 0.6)";
+export const DEFAULT_FOREGROUND = "rgba(255, 255, 255, 0.6)";
 const ELBOW_OFFSET_RATIO = 0.04;
 
 const BALL_RADIUS_RATIO = 0.032;
 
 const HAND_SIZE_RATIO = 0.025;
 const HAND_LINE_WIDTH = 2;
-const HAND_STROKE_STYLE = "rgba(255, 255, 255, 0.4)";
 
 /** Pre-computed data for a single animation frame, passed to the renderer or a {@link CustomRenderFn}. */
 export type FrameData = {
   /** CSS color string for the canvas background. */
   readonly background: string;
+  /** CSS color string for the juggler and hand strokes. */
+  readonly foreground: string;
   /** Whether the stick-figure juggler should be drawn. */
   readonly showJuggler: boolean;
   /** Positions of each hand in canvas coordinates. */
@@ -48,11 +50,11 @@ export const renderFrame = (
   clearCanvas(ctx, width, height, frame.background);
 
   if (frame.showJuggler) {
-    drawJuggler(ctx, width, height, frame.handPositions);
+    drawJuggler(ctx, width, height, frame.handPositions, frame.foreground);
   }
 
   for (const hand of frame.handPositions) {
-    drawHand(ctx, width, hand);
+    drawHand(ctx, width, hand, frame.foreground);
   }
 
   for (const ball of frame.balls) {
@@ -60,22 +62,25 @@ export const renderFrame = (
   }
 };
 
-const clearCanvas = (
+export const clearCanvas = (
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
   background: string,
 ) => {
-  ctx.fillStyle = background;
-  ctx.fillRect(0, 0, width, height);
+  if (background === "transparent") {
+    ctx.clearRect(0, 0, width, height);
+  } else {
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, width, height);
+  }
 };
 
 /**
  * Draw a stick-figure juggler with arms extending to the given hand positions.
  *
- * Renders a head, spine, shoulder line, and two-segment arms (shoulder → elbow → hand)
- * using semi-transparent white strokes. Useful in custom render functions when you want
- * to keep the default juggler appearance.
+ * Renders a head, spine, shoulder line, and two-segment arms (shoulder → elbow → hand).
+ * Useful in custom render functions when you want to keep the default juggler appearance.
  *
  * @param ctx - The 2D rendering context of the canvas.
  * @param width - Canvas width in pixels (used to scale proportions).
@@ -87,16 +92,18 @@ export const drawJuggler = (
   width: number,
   height: number,
   handPositions: readonly Vec2[],
+  foreground = DEFAULT_FOREGROUND,
 ) => {
+  const eh = effectiveHeight(width, height);
   const centerX = width / 2;
   const headRadius = width * HEAD_RADIUS_RATIO;
-  const headY = height * HEAD_Y_RATIO;
+  const headY = height - eh * (1 - HEAD_Y_RATIO);
   const neckY = headY + headRadius;
-  const shoulderY = neckY + height * NECK_TO_SHOULDER_RATIO;
-  const waistY = height * WAIST_Y_RATIO;
+  const shoulderY = neckY + eh * NECK_TO_SHOULDER_RATIO;
+  const waistY = height - eh * (1 - WAIST_Y_RATIO);
   const shoulderWidth = width * SHOULDER_WIDTH_RATIO;
 
-  ctx.strokeStyle = JUGGLER_STROKE_STYLE;
+  ctx.strokeStyle = foreground;
   ctx.lineWidth = JUGGLER_LINE_WIDTH;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -119,7 +126,7 @@ export const drawJuggler = (
     const shoulderX = hand.x < centerX ? centerX - shoulderWidth : centerX + shoulderWidth;
 
     const elbowX = (shoulderX + hand.x) / 2;
-    const elbowY = (shoulderY + hand.y) / 2 + height * ELBOW_OFFSET_RATIO;
+    const elbowY = (shoulderY + hand.y) / 2 + eh * ELBOW_OFFSET_RATIO;
 
     ctx.beginPath();
     ctx.moveTo(shoulderX, shoulderY);
@@ -164,10 +171,15 @@ export const drawBall = (
  * @param canvasWidth - Canvas width in pixels (used to scale the hand size).
  * @param position - Center position of the hand in canvas coordinates.
  */
-export const drawHand = (ctx: CanvasRenderingContext2D, canvasWidth: number, position: Vec2) => {
+export const drawHand = (
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  position: Vec2,
+  foreground = DEFAULT_FOREGROUND,
+) => {
   const size = canvasWidth * HAND_SIZE_RATIO;
 
-  ctx.strokeStyle = HAND_STROKE_STYLE;
+  ctx.strokeStyle = foreground;
   ctx.lineWidth = HAND_LINE_WIDTH;
   ctx.beginPath();
   ctx.arc(position.x, position.y, size, 0, Math.PI, false);

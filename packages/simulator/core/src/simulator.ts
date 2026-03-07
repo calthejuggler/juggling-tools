@@ -1,5 +1,10 @@
-import { computeBallPositions, getHandPositions, HAND_Y_RATIO } from "./physics.js";
-import { renderFrame } from "./render.js";
+import {
+  computeBallPositions,
+  effectiveHeight,
+  getHandPositions,
+  HAND_Y_RATIO,
+} from "./physics.js";
+import { DEFAULT_FOREGROUND, renderFrame } from "./render.js";
 import type { FrameData } from "./render.js";
 import type { BallSchedule } from "./schedule.js";
 import { computeSchedule, computeScheduleForPartial } from "./schedule.js";
@@ -40,6 +45,8 @@ export type SimulatorOptions = {
   colors?: string[];
   /** CSS color string used to fill the canvas background each frame. @defaultValue `"#111111"` */
   background?: string;
+  /** CSS color string for the juggler and hand strokes. @defaultValue `"rgba(255, 255, 255, 0.6)"` */
+  foreground?: string;
   /** Whether to draw the stick-figure juggler. @defaultValue true */
   showJuggler?: boolean;
   /** Whether to animate hold throws (throw value = number of hands) as arcs. When `false`, holds keep the ball in hand. @defaultValue false */
@@ -74,6 +81,8 @@ export type Simulator = {
   readonly setColors: (colors: string[]) => void;
   /** Change the canvas background color. Takes effect on the next frame. */
   readonly setBackground: (background: string) => void;
+  /** Change the juggler and hand stroke color. Takes effect on the next frame. */
+  readonly setForeground: (foreground: string) => void;
   /** Toggle the stick-figure juggler visibility. Takes effect on the next frame. */
   readonly setShowJuggler: (showJuggler: boolean) => void;
   /** Set or clear a custom render function. Pass `undefined` to restore the default renderer. */
@@ -111,6 +120,7 @@ const DEFAULTS = {
   arcPeakPosition: 0.55,
   colors: DEFAULT_COLORS,
   background: "#111111",
+  foreground: DEFAULT_FOREGROUND,
   showJuggler: true,
   throwHolds: false,
 };
@@ -123,6 +133,7 @@ const resolveConfig = (options: SimulatorOptions) => ({
   arcPeakPosition: options.arcPeakPosition ?? DEFAULTS.arcPeakPosition,
   colors: options.colors ?? DEFAULTS.colors,
   background: options.background ?? DEFAULTS.background,
+  foreground: options.foreground ?? DEFAULTS.foreground,
   showJuggler: options.showJuggler ?? DEFAULTS.showJuggler,
   throwHolds: options.throwHolds ?? DEFAULTS.throwHolds,
 });
@@ -214,21 +225,29 @@ const stepState = (prev: SimState, elapsed: number): SimState => {
   return prev;
 };
 
-const computeHeightPerThrow = (siteswap: readonly number[], canvasHeight: number) => {
+const computeHeightPerThrow = (
+  siteswap: readonly number[],
+  canvasWidth: number,
+  canvasHeight: number,
+) => {
+  const eh = effectiveHeight(canvasWidth, canvasHeight);
   const maxThrow = Math.max(...siteswap);
-  const handY = canvasHeight * HAND_Y_RATIO;
+  const handY = canvasHeight - eh * (1 - HAND_Y_RATIO);
   const topMargin = canvasHeight * TOP_MARGIN_RATIO;
   const availableHeight = handY - topMargin;
-  return Math.min(
-    canvasHeight * MAX_HEIGHT_PER_THROW_RATIO,
-    availableHeight / Math.max(maxThrow, 1),
-  );
+  return Math.min(eh * MAX_HEIGHT_PER_THROW_RATIO, availableHeight / Math.max(maxThrow, 1));
 };
 
-const computeFrame = (state: SimState, elapsed: number, canvasHeight: number) => {
-  const heightPerThrow = computeHeightPerThrow(state.config.siteswap, canvasHeight);
+const computeFrame = (
+  state: SimState,
+  elapsed: number,
+  canvasWidth: number,
+  canvasHeight: number,
+) => {
+  const heightPerThrow = computeHeightPerThrow(state.config.siteswap, canvasWidth, canvasHeight);
   return {
     background: state.config.background,
+    foreground: state.config.foreground,
     showJuggler: state.config.showJuggler,
     handPositions: state.handPositions,
     balls: computeBallPositions(state.balls, elapsed, state.handPositions, {
@@ -285,7 +304,7 @@ export const createSimulator = (
       state = stepState(state, elapsed);
     }
 
-    const frame = computeFrame(state, elapsed, canvas.height);
+    const frame = computeFrame(state, elapsed, canvas.width, canvas.height);
     if (customRender) {
       customRender(ctx, canvas.width, canvas.height, frame);
     } else {
@@ -349,6 +368,10 @@ export const createSimulator = (
     state = { ...state, config: { ...state.config, background } };
   };
 
+  const setForeground = (foreground: string) => {
+    state = { ...state, config: { ...state.config, foreground } };
+  };
+
   const setShowJuggler = (showJuggler: boolean) => {
     state = { ...state, config: { ...state.config, showJuggler } };
   };
@@ -395,6 +418,7 @@ export const createSimulator = (
     setArcPeakPosition,
     setColors,
     setBackground,
+    setForeground,
     setShowJuggler,
     setRender,
     resize,

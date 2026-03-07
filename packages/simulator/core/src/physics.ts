@@ -4,6 +4,7 @@ import type { Vec2 } from "./types.js";
 export const HAND_Y_RATIO = 0.85;
 const HAND_SPREAD_RATIO = 0.18;
 const PARABOLIC_SCALE_FACTOR = 4;
+const IDEAL_ASPECT_RATIO = 10 / 14; // width / height (portrait canvas)
 
 /** A ball's computed position and color for a single animation frame. */
 export type BallPosition = {
@@ -22,9 +23,21 @@ type PhysicsConfig = {
   readonly throwHolds: boolean;
 };
 
+/**
+ * Compute the effective height used for vertical positioning.
+ *
+ * On portrait canvases this equals the canvas height. On landscape canvases
+ * the effective height is derived from the width so the juggler and
+ * pattern scale up to fill the visible area.
+ */
+export const effectiveHeight = (canvasWidth: number, canvasHeight: number) =>
+  Math.max(canvasHeight, canvasWidth / IDEAL_ASPECT_RATIO);
+
 export const getHandPositions = (canvasWidth: number, canvasHeight: number, numHands: number) => {
   const centerX = canvasWidth / 2;
-  const handY = canvasHeight * HAND_Y_RATIO;
+  const eh = effectiveHeight(canvasWidth, canvasHeight);
+  // Anchor hands near the bottom of the visible canvas
+  const handY = canvasHeight - eh * (1 - HAND_Y_RATIO);
   const spread = canvasWidth * HAND_SPREAD_RATIO;
 
   if (numHands === 2) {
