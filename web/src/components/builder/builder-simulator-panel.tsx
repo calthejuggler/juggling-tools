@@ -17,7 +17,7 @@ export function BuilderSimulatorPanel({ state, numProps }: BuilderSimulatorPanel
   const isComplete = state.steps.length > 0 && state.currentState === state.groundState;
   const isEmpty = state.steps.length === 0;
 
-  if (isEmpty) {
+  if (isEmpty)
     return (
       <div className="flex h-full items-center justify-center p-4">
         <p className="text-muted-foreground text-center text-sm">
@@ -25,7 +25,6 @@ export function BuilderSimulatorPanel({ state, numProps }: BuilderSimulatorPanel
         </p>
       </div>
     );
-  }
 
   if (isComplete) {
     const siteswap = throwValues.map((v) => v.toString(36)).join("");
