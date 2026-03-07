@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1](https://github.com/calthejuggler/juggling-tools/compare/juggling-tools-v0.1.0...juggling-tools-v0.1.1) - 2026-03-07
+
+### Other
+
+- add READMEs and LICENSE files for published packages
+
 ## [0.1.0](https://github.com/calthejuggler/juggling-tools/releases/tag/juggling-tools-v0.1.0) - 2026-03-07
 
 ### Added
