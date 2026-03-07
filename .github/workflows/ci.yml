@@ -7,6 +7,7 @@ on:
       - "**/*.md"
       - ".changeset/**"
       - ".github/**"
+      - "scripts/**"
       - ".editorconfig"
       - ".gitignore"
       - ".prettierrc"
