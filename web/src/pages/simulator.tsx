@@ -18,8 +18,8 @@ const Controls = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        className="border-neutral-700 bg-neutral-900 text-white"
         <Input
+          className="border-neutral-700 bg-neutral-900 text-white"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {

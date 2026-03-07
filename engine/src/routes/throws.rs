@@ -51,7 +51,7 @@ fn serialize_throws(
             } else {
                 binary
             };
-            format!("\"{}\"", display)
+            format!("\"{display}\"")
         }
     };
 

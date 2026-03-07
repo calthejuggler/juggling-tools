@@ -1,3 +1,5 @@
+import type { FC } from "react";
+
 import type { Vec2 } from "@juggling-tools/simulator";
 
 export type HandRenderData = {
@@ -21,11 +23,11 @@ export type HandProps = {
   children?: HandRenderFn;
 };
 
-export const Hand = (_props: HandProps) => null;
+export const Hand: FC<HandProps> = () => null;
 
 export type HandsProps = {
   count?: number;
   children?: React.ReactNode;
 };
 
-export const Hands = (_props: HandsProps) => null;
+export const Hands: FC<HandsProps> = () => null;

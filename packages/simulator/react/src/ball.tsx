@@ -1,3 +1,5 @@
+import type { FC } from "react";
+
 import type { Vec2 } from "@juggling-tools/simulator";
 
 export type BallRenderData = {
@@ -19,4 +21,4 @@ export type BallProps = {
   children?: BallRenderFn;
 };
 
-export const Ball = (_props: BallProps) => null;
+export const Ball: FC<BallProps> = () => null;

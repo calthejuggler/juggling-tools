@@ -38,8 +38,7 @@ pub async fn precompute(
                     let effective_reversed = !compact && reversed;
 
                     let graph_key = format!(
-                        "v{}-{}-{}-{}-{}",
-                        schema_version, num_props, max_height, compact, effective_reversed
+                        "v{schema_version}-{num_props}-{max_height}-{compact}-{effective_reversed}"
                     );
                     if file_cache.exists(&graph_key).await {
                         cached += 1;
@@ -69,8 +68,7 @@ pub async fn precompute(
                     }
 
                     let table_key = format!(
-                        "table-v{}-{}-{}-{}-{}",
-                        schema_version, num_props, max_height, compact, effective_reversed
+                        "table-v{schema_version}-{num_props}-{max_height}-{compact}-{effective_reversed}"
                     );
                     if file_cache.exists(&table_key).await {
                         cached += 1;

@@ -1,3 +1,5 @@
+import type { FC } from "react";
+
 import type { Vec2 } from "@juggling-tools/simulator";
 
 export type JugglerRenderData = {
@@ -17,4 +19,4 @@ export type JugglerProps = {
   children?: JugglerRenderFn;
 };
 
-export const Juggler = (_props: JugglerProps) => null;
+export const Juggler: FC<JugglerProps> = () => null;

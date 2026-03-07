@@ -55,26 +55,26 @@
       <button id="go">Go</button>
     </div>
     <script type="module">
-      import { createSimulator } from "./dist/index.js"
+      import { createSimulator } from "./dist/index.js";
 
-      const canvas = document.getElementById("juggler")
-      const input = document.getElementById("siteswap")
-      const btn = document.getElementById("go")
+      const canvas = document.getElementById("juggler");
+      const input = document.getElementById("siteswap");
+      const btn = document.getElementById("go");
 
-      const sim = createSimulator(canvas, { siteswap: input.value })
-      sim.start()
+      const sim = createSimulator(canvas, { siteswap: input.value });
+      sim.start();
 
       btn.addEventListener("click", () => {
         try {
-          sim.setSiteswap(input.value)
+          sim.setSiteswap(input.value);
         } catch (e) {
-          alert(e.message)
+          alert(e.message);
         }
-      })
+      });
 
       input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") btn.click()
-      })
+        if (e.key === "Enter") btn.click();
+      });
     </script>
   </body>
 </html>

@@ -110,7 +110,7 @@ impl FileCache {
         self.evict_if_needed(disk_size).await;
 
         let final_path = self.path(key);
-        let tmp_path = self.dir.join(format!(".{}.tmp", key));
+        let tmp_path = self.dir.join(format!(".{key}.tmp"));
 
         let result = async {
             let mut f = fs::File::create(&tmp_path).await?;

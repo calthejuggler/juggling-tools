@@ -135,7 +135,7 @@ pub fn compute_graph(params: &StateNotationQuery) -> Vec<u8> {
             } else {
                 binary
             };
-            format!("\"{}\"", display)
+            format!("\"{display}\"")
         }
     };
 

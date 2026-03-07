@@ -181,8 +181,7 @@ pub fn compute_table(params: &StateNotationQuery) -> Vec<u8> {
     write_state(&mut buf, &table.ground_state);
     let _ = write!(
         buf,
-        ",\"num_states\":{},\"max_height\":{},\"num_props\":{}",
-        n, max_height, num_props
+        ",\"num_states\":{n},\"max_height\":{max_height},\"num_props\":{num_props}"
     );
     buf.push('}');
 
