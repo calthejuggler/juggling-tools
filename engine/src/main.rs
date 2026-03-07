@@ -24,9 +24,16 @@ pub struct AppState {
 }
 
 async fn require_api_key(req: Request, next: Next) -> Result<Response, StatusCode> {
-    let expected = std::env::var("ENGINE_API_KEY").unwrap_or_default();
+    static EXPECTED: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| {
+        let key = std::env::var("ENGINE_API_KEY").expect("ENGINE_API_KEY must be set");
+        assert!(!key.is_empty(), "ENGINE_API_KEY must not be empty");
+        key
+    });
+
     match req.headers().get("x-api-key") {
-        Some(key) if key == expected.as_str() => Ok(next.run(req).await),
+        Some(key) if subtle::ConstantTimeEq::ct_eq(key.as_bytes(), EXPECTED.as_bytes()).into() => {
+            Ok(next.run(req).await)
+        }
         _ => Err(StatusCode::UNAUTHORIZED),
     }
 }
