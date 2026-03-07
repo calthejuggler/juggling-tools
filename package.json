@@ -25,7 +25,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p web/tsconfig.app.json",
-    "knip": "knip",
+    "knip": "cd web && bunx @inlang/paraglide-js compile --silent && cd .. && knip",
     "build:simulator": "bun run --filter '@juggling-tools/simulator' build",
     "build:simulator-react": "bun run build:simulator && bun run --filter '@juggling-tools/simulator-react' build",
     "prepare": "lefthook install"
