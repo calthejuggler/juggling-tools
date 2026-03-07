@@ -1,5 +1,11 @@
 # @juggling-tools/simulator
 
+## 0.2.0
+
+### Minor Changes
+
+- [`c54ecca`](https://github.com/calthejuggler/juggling-tools/commit/c54eccaf859615e766aa1839cf48171c30fdeee1) Thanks [@calthejuggler](https://github.com/calthejuggler)! - Add partial pattern animation with raw throw values, loop control and hold throws
+
 ## 0.1.1
 
 ### Patch Changes
