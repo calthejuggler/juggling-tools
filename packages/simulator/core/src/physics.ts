@@ -5,8 +5,11 @@ export const HAND_Y_RATIO = 0.85;
 const HAND_SPREAD_RATIO = 0.18;
 const PARABOLIC_SCALE_FACTOR = 4;
 
+/** A ball's computed position and color for a single animation frame. */
 export type BallPosition = {
+  /** Current position of the ball in canvas coordinates. */
   readonly position: Vec2;
+  /** CSS color string assigned to this ball. */
   readonly color: string;
 };
 

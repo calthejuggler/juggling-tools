@@ -16,13 +16,29 @@ const HAND_SIZE_RATIO = 0.025;
 const HAND_LINE_WIDTH = 2;
 const HAND_STROKE_STYLE = "rgba(255, 255, 255, 0.4)";
 
+/** Pre-computed data for a single animation frame, passed to the renderer or a {@link CustomRenderFn}. */
 export type FrameData = {
+  /** CSS color string for the canvas background. */
   readonly background: string;
+  /** Whether the stick-figure juggler should be drawn. */
   readonly showJuggler: boolean;
+  /** Positions of each hand in canvas coordinates. */
   readonly handPositions: readonly Vec2[];
+  /** Current position and color for each ball in the pattern. */
   readonly balls: readonly BallPosition[];
 };
 
+/**
+ * Render a complete animation frame using the built-in renderer.
+ *
+ * Clears the canvas, then draws the juggler (if enabled), hands, and balls.
+ * This is the default render pipeline used when no custom render function is set.
+ *
+ * @param ctx - The 2D rendering context of the canvas.
+ * @param width - Canvas width in pixels.
+ * @param height - Canvas height in pixels.
+ * @param frame - Pre-computed frame data to draw.
+ */
 export const renderFrame = (
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -54,6 +70,18 @@ const clearCanvas = (
   ctx.fillRect(0, 0, width, height);
 };
 
+/**
+ * Draw a stick-figure juggler with arms extending to the given hand positions.
+ *
+ * Renders a head, spine, shoulder line, and two-segment arms (shoulder → elbow → hand)
+ * using semi-transparent white strokes. Useful in custom render functions when you want
+ * to keep the default juggler appearance.
+ *
+ * @param ctx - The 2D rendering context of the canvas.
+ * @param width - Canvas width in pixels (used to scale proportions).
+ * @param height - Canvas height in pixels (used to scale proportions).
+ * @param handPositions - Position of each hand in canvas coordinates.
+ */
 export const drawJuggler = (
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -101,6 +129,17 @@ export const drawJuggler = (
   }
 };
 
+/**
+ * Draw a single ball as a filled circle.
+ *
+ * The ball radius scales proportionally with the canvas width.
+ * Useful in custom render functions when you want to keep the default ball appearance.
+ *
+ * @param ctx - The 2D rendering context of the canvas.
+ * @param canvasWidth - Canvas width in pixels (used to scale the ball radius).
+ * @param position - Center position of the ball in canvas coordinates.
+ * @param color - CSS color string for the ball fill.
+ */
 export const drawBall = (
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
@@ -115,6 +154,16 @@ export const drawBall = (
   ctx.fill();
 };
 
+/**
+ * Draw a single hand as a semi-circular arc (palm-up).
+ *
+ * The hand size scales proportionally with the canvas width.
+ * Useful in custom render functions when you want to keep the default hand appearance.
+ *
+ * @param ctx - The 2D rendering context of the canvas.
+ * @param canvasWidth - Canvas width in pixels (used to scale the hand size).
+ * @param position - Center position of the hand in canvas coordinates.
+ */
 export const drawHand = (ctx: CanvasRenderingContext2D, canvasWidth: number, position: Vec2) => {
   const size = canvasWidth * HAND_SIZE_RATIO;
 
