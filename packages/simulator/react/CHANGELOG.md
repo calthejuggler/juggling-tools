@@ -1,5 +1,16 @@
 # @juggling-tools/simulator-react
 
+## 1.1.0
+
+### Minor Changes
+
+- [`913165d`](https://github.com/calthejuggler/juggling-tools/commit/913165d4e0953b28274b20f0ebf45dec71ea553d) Thanks [@calthejuggler](https://github.com/calthejuggler)! - Add `foreground` prop to `Simulator.Root` for customising juggler and hand stroke colour. Support transparent backgrounds. Re-export `DEFAULT_FOREGROUND` from core.
+
+### Patch Changes
+
+- Updated dependencies [[`913165d`](https://github.com/calthejuggler/juggling-tools/commit/913165d4e0953b28274b20f0ebf45dec71ea553d)]:
+  - @juggling-tools/simulator@1.1.0
+
 ## 1.0.0
 
 ### Minor Changes

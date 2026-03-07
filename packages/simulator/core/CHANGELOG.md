@@ -1,5 +1,11 @@
 # @juggling-tools/simulator
 
+## 1.1.0
+
+### Minor Changes
+
+- [`913165d`](https://github.com/calthejuggler/juggling-tools/commit/913165d4e0953b28274b20f0ebf45dec71ea553d) Thanks [@calthejuggler](https://github.com/calthejuggler)! - Add configurable foreground color for juggler and hand strokes. Support transparent backgrounds via `clearCanvas`, which is now exported. Export `DEFAULT_FOREGROUND` constant. Add `effectiveHeight` scaling so the juggler and pattern scale correctly on landscape canvases.
+
 ## 0.2.0
 
 ### Minor Changes
