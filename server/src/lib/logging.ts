@@ -11,7 +11,6 @@ export type WideEvent = {
   engine_status?: number;
   error_code?: string;
   error_message?: string;
-  ban_info_result?: string;
   user_id?: string;
   user_role?: string;
   contact_name?: string;
