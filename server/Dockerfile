@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package.json bun.lock ./
 COPY server/package.json ./server/
 COPY web/package.json ./web/
+COPY packages/simulator/core/package.json ./packages/simulator/core/
+COPY packages/simulator/react/package.json ./packages/simulator/react/
 
 RUN bun install --frozen-lockfile --ignore-scripts
 

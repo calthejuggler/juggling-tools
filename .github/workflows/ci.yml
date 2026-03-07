@@ -142,16 +142,14 @@ jobs:
     name: Web Check
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: web
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: "package.json"
       - run: bun install --frozen-lockfile
-      - run: bun run build
+      - run: bun run build:simulator-react
+      - run: cd web && bun run build
 
   web-build:
     name: Web Build

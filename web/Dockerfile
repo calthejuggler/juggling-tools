@@ -4,9 +4,12 @@ WORKDIR /app
 COPY package.json bun.lock ./
 COPY web/package.json ./web/
 COPY server/package.json ./server/
+COPY packages/simulator/core/package.json ./packages/simulator/core/
+COPY packages/simulator/react/package.json ./packages/simulator/react/
 RUN bun install --frozen-lockfile --ignore-scripts
+COPY packages/simulator/ ./packages/simulator/
 COPY web/ ./web/
-RUN cd web && bun run build
+RUN bun run build:simulator-react && cd web && bun run build
 
 FROM caddy:alpine
 COPY web/Caddyfile /etc/caddy/Caddyfile
