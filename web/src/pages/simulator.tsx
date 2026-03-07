@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import {
   Simulator,
@@ -6,8 +6,10 @@ import {
   type BallRenderFn,
   type HandRenderFn,
   type JugglerRenderFn,
-  type SimulatorHandle,
 } from "@juggling-tools/simulator-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const Controls = () => {
   const { start, stop, isRunning, setSiteswap, siteswap, error } = useSimulator();
@@ -16,28 +18,20 @@ const Controls = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <input
-          className="rounded border border-neutral-700 bg-neutral-900 px-3 py-1.5 text-white"
+        className="border-neutral-700 bg-neutral-900 text-white"
+        <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") setSiteswap(input);
           }}
         />
-        <button
-          className="rounded bg-blue-600 px-4 py-1.5 text-white hover:bg-blue-500"
-          onClick={() => setSiteswap(input)}
-        >
-          Set
-        </button>
-        <button
-          className="rounded bg-neutral-700 px-4 py-1.5 text-white hover:bg-neutral-600"
-          onClick={isRunning ? stop : start}
-        >
+        <Button onClick={() => setSiteswap(input)}>Set</Button>
+        <Button variant="secondary" onClick={isRunning ? stop : start}>
           {isRunning ? "Pause" : "Play"}
-        </button>
+        </Button>
       </div>
-      {error && <p className="text-sm text-red-400">{error.message}</p>}
+      {error && <p className="text-destructive text-sm">{error.message}</p>}
     </div>
   );
 };
@@ -121,8 +115,6 @@ const drawStickFigure: JugglerRenderFn = ({ ctx, width, height, handPositions })
 };
 
 export const SimulatorPage = () => {
-  const handleRef = useRef<SimulatorHandle>(null);
-
   return (
     <div className="flex min-h-screen flex-col items-center gap-6 bg-neutral-950 p-8">
       <h1 className="text-2xl font-bold text-white">Simulator Demo</h1>
@@ -205,7 +197,7 @@ export const SimulatorPage = () => {
 
         <div className="flex flex-col items-center gap-2">
           <h2 className="text-sm font-medium text-neutral-400">With controls (hook)</h2>
-          <Simulator.Root ref={handleRef} siteswap="744" autoStart>
+          <Simulator.Root siteswap="744" autoStart>
             <Simulator.Canvas width={300} height={420} className="rounded-xl">
               <Simulator.Juggler />
               <Simulator.Hands />
