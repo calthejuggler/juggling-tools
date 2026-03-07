@@ -1,10 +1,9 @@
 import type { BallSchedule, ThrowEvent } from "./schedule.js";
 import type { Vec2 } from "./types.js";
 
-const HAND_Y_RATIO = 0.85;
+export const HAND_Y_RATIO = 0.85;
 const HAND_SPREAD_RATIO = 0.18;
 const PARABOLIC_SCALE_FACTOR = 4;
-const LOG_BASE = 0.5;
 
 export type BallPosition = {
   readonly position: Vec2;
@@ -14,7 +13,7 @@ export type BallPosition = {
 export type PhysicsConfig = {
   readonly beatDuration: number;
   readonly dwellRatio: number;
-  readonly arcPeakPosition: number;
+  readonly arcSkewExponent: number;
   readonly heightPerThrow: number;
 };
 
@@ -30,15 +29,13 @@ export const getHandPositions = (canvasWidth: number, canvasHeight: number, numH
     ];
   }
 
-  const positions: Vec2[] = [];
-  for (let i = 0; i < numHands; i++) {
-    const t = numHands === 1 ? 0.5 : i / (numHands - 1);
-    positions.push({
-      x: centerX - spread + t * spread * 2,
+  return Array.from({ length: numHands }, (_, i) => {
+    const normalizedPosition = numHands === 1 ? 0.5 : i / (numHands - 1);
+    return {
+      x: centerX - spread + normalizedPosition * spread * 2,
       y: handY,
-    });
-  }
-  return positions;
+    };
+  });
 };
 
 export const computeBallPositions = (
@@ -47,14 +44,13 @@ export const computeBallPositions = (
   handPositions: readonly Vec2[],
   physics: PhysicsConfig,
 ) => {
-  const result: BallPosition[] = [];
-  for (const ball of balls) {
+  return balls.reduce<BallPosition[]>((result, ball) => {
     const position = findBallPosition(ball.throwEvents, elapsed, handPositions, physics);
     if (position) {
       result.push({ position, color: ball.color });
     }
-  }
-  return result;
+    return result;
+  }, []);
 };
 
 const findBallPosition = (
@@ -63,7 +59,7 @@ const findBallPosition = (
   handPositions: readonly Vec2[],
   physics: PhysicsConfig,
 ) => {
-  const { beatDuration, dwellRatio, heightPerThrow, arcPeakPosition } = physics;
+  const { beatDuration, dwellRatio, heightPerThrow, arcSkewExponent } = physics;
 
   for (let i = throwEvents.length - 1; i >= 0; i--) {
     const event = throwEvents[i];
@@ -88,7 +84,7 @@ const findBallPosition = (
         const flightDuration = landTime - releaseTime;
         const progress = (elapsed - releaseTime) / flightDuration;
         const peakHeight = event.throwValue * heightPerThrow;
-        return parabolicPosition(from, to, progress, peakHeight, arcPeakPosition);
+        return parabolicPosition(from, to, progress, peakHeight, arcSkewExponent);
       }
 
       const hand = handPositions[event.toHand];
@@ -112,11 +108,10 @@ const parabolicPosition = (
   to: Vec2,
   progress: number,
   peakHeight: number,
-  peakPos: number,
+  skewExponent: number,
 ) => {
   const height = peakHeight * PARABOLIC_SCALE_FACTOR * progress * (1 - progress);
-  const k = Math.log(peakPos) / Math.log(LOG_BASE);
-  const xProgress = Math.pow(progress, k);
+  const xProgress = Math.pow(progress, skewExponent);
   return {
     x: from.x + (to.x - from.x) * xProgress,
     y: from.y + (to.y - from.y) * xProgress - height,

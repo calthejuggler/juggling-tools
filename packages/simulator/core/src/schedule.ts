@@ -14,19 +14,6 @@ export type BallSchedule = {
   readonly throwEvents: readonly ThrowEvent[];
 };
 
-const DEFAULT_COLORS = [
-  "#ef4444",
-  "#22c55e",
-  "#3b82f6",
-  "#eab308",
-  "#a855f7",
-  "#ec4899",
-  "#f97316",
-  "#06b6d4",
-  "#84cc16",
-  "#f43f5e",
-];
-
 export const computeSchedule = (
   siteswap: number[],
   numHands: number,
@@ -45,13 +32,13 @@ export const computeSchedule = (
       }))
     : Array.from({ length: count }, (_, i) => ({
         id: i,
-        color: colors[i % colors.length] || DEFAULT_COLORS[i % DEFAULT_COLORS.length],
+        color: colors[i % colors.length],
         throwEvents: [],
       }));
 
   const handQueues = new Map<number, number[]>();
-  for (let h = 0; h < numHands; h++) {
-    handQueues.set(h, []);
+  for (let handIndex = 0; handIndex < numHands; handIndex++) {
+    handQueues.set(handIndex, []);
   }
   const pendingLandings = new Map<number, number[]>();
 

@@ -1,4 +1,4 @@
-import { computeBallPositions, getHandPositions } from "./physics.js";
+import { computeBallPositions, getHandPositions, HAND_Y_RATIO } from "./physics.js";
 import { renderFrame } from "./render.js";
 import type { FrameData } from "./render.js";
 import type { BallSchedule } from "./schedule.js";
@@ -43,7 +43,6 @@ export type Simulator = {
 const INITIAL_SCHEDULE_BEATS = 50;
 const SCHEDULE_REFRESH_THRESHOLD = 0.7;
 const TOP_MARGIN_RATIO = 0.05;
-const HAND_Y_RATIO = 0.85;
 const MAX_HEIGHT_PER_THROW_RATIO = 0.06;
 
 const DEFAULT_COLORS = [
@@ -83,20 +82,29 @@ type SimulatorConfig = ReturnType<typeof resolveConfig>;
 type SimState = {
   readonly config: SimulatorConfig;
   readonly balls: readonly BallSchedule[];
+  readonly scheduledUpToBeat: number;
   readonly handPositions: readonly Vec2[];
+  readonly arcSkewExponent: number;
   readonly startTime: number;
 };
+
+const ARC_SKEW_LOG_BASE = 0.5;
+
+const computeArcSkewExponent = (arcPeakPosition: number) =>
+  Math.log(arcPeakPosition) / Math.log(ARC_SKEW_LOG_BASE);
 
 const createState = (canvas: HTMLCanvasElement, config: SimulatorConfig): SimState => ({
   config,
   balls: computeSchedule(config.siteswap, config.numHands, INITIAL_SCHEDULE_BEATS, config.colors),
+  scheduledUpToBeat: INITIAL_SCHEDULE_BEATS,
   handPositions: getHandPositions(canvas.width, canvas.height, config.numHands),
+  arcSkewExponent: computeArcSkewExponent(config.arcPeakPosition),
   startTime: 0,
 });
 
 const stepState = (prev: SimState, elapsed: number): SimState => {
   const currentBeat = elapsed / prev.config.beatDuration;
-  if (currentBeat > (prev.balls[0]?.throwEvents.length ?? 0) * SCHEDULE_REFRESH_THRESHOLD) {
+  if (currentBeat > prev.scheduledUpToBeat * SCHEDULE_REFRESH_THRESHOLD) {
     const maxBeat = Math.ceil(currentBeat) + INITIAL_SCHEDULE_BEATS;
     return {
       ...prev,
@@ -107,6 +115,7 @@ const stepState = (prev: SimState, elapsed: number): SimState => {
         prev.config.colors,
         prev.balls,
       ),
+      scheduledUpToBeat: maxBeat,
     };
   }
   return prev;
@@ -132,7 +141,7 @@ const computeFrame = (state: SimState, elapsed: number, canvasHeight: number) =>
     balls: computeBallPositions(state.balls, elapsed, state.handPositions, {
       beatDuration: state.config.beatDuration,
       dwellRatio: state.config.dwellRatio,
-      arcPeakPosition: state.config.arcPeakPosition,
+      arcSkewExponent: state.arcSkewExponent,
       heightPerThrow,
     }),
   };
@@ -180,21 +189,6 @@ export const createSimulator = (
     if (wasRunning) start();
   };
 
-  const rebuildSchedule = () => {
-    const wasRunning = animationId !== null;
-    stop();
-    state = {
-      ...state,
-      balls: computeSchedule(
-        state.config.siteswap,
-        state.config.numHands,
-        INITIAL_SCHEDULE_BEATS,
-        state.config.colors,
-      ),
-    };
-    if (wasRunning) start();
-  };
-
   const setSiteswap = (siteswap: string) => {
     state = { ...state, config: { ...state.config, siteswap: parseSiteswap(siteswap) } };
     rebuildState();
@@ -207,17 +201,18 @@ export const createSimulator = (
 
   const setBeatDuration = (beatDuration: number) => {
     state = { ...state, config: { ...state.config, beatDuration } };
-    rebuildSchedule();
   };
 
   const setDwellRatio = (dwellRatio: number) => {
     state = { ...state, config: { ...state.config, dwellRatio } };
-    rebuildSchedule();
   };
 
   const setArcPeakPosition = (arcPeakPosition: number) => {
-    state = { ...state, config: { ...state.config, arcPeakPosition } };
-    rebuildSchedule();
+    state = {
+      ...state,
+      config: { ...state.config, arcPeakPosition },
+      arcSkewExponent: computeArcSkewExponent(arcPeakPosition),
+    };
   };
 
   const setColors = (colors: string[]) => {

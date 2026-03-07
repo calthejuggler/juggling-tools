@@ -1,13 +1,13 @@
 export const parseSiteswap = (input: string) =>
-  [...input].map((c) => {
-    const value = parseInt(c, 36);
-    if (isNaN(value)) throw new Error(`Invalid siteswap character: '${c}'`);
+  [...input].map((char) => {
+    const value = parseInt(char, 36);
+    if (isNaN(value)) throw new Error(`Invalid siteswap character: '${char}'`);
     return value;
   });
 
 export const numBalls = (values: number[]) => {
   if (values.length === 0) throw new Error("Empty siteswap");
-  const sum = values.reduce((a, b) => a + b, 0);
+  const sum = values.reduce((total, value) => total + value, 0);
   if (sum % values.length !== 0) throw new Error("Invalid siteswap: average is not an integer");
   return sum / values.length;
 };
@@ -16,13 +16,13 @@ export const computeInitialState = (siteswap: number[]) => {
   const maxThrow = Math.max(...siteswap);
   if (maxThrow === 0) return [];
   const state = new Array(maxThrow).fill(false);
-  const L = siteswap.length;
-  const periodsBack = Math.ceil(maxThrow / L);
+  const patternLength = siteswap.length;
+  const periodsBack = Math.ceil(maxThrow / patternLength);
 
-  for (let p = 1; p <= periodsBack; p++) {
-    for (let i = 0; i < L; i++) {
-      const beat = i - p * L;
-      const throwVal = siteswap[i];
+  for (let period = 1; period <= periodsBack; period++) {
+    for (let beatIndex = 0; beatIndex < patternLength; beatIndex++) {
+      const beat = beatIndex - period * patternLength;
+      const throwVal = siteswap[beatIndex];
       const landingBeat = beat + throwVal;
       if (landingBeat >= 0 && landingBeat < maxThrow) {
         state[landingBeat] = true;
