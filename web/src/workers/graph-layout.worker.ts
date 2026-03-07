@@ -8,7 +8,7 @@ import {
 } from "@/lib/graph-layout";
 import type { GraphApiResponse, GraphEdge, GraphNode } from "@/lib/graph-types";
 
-export interface LayoutRequest {
+interface LayoutRequest {
   id: number;
   data: GraphApiResponse;
   reversed: boolean;

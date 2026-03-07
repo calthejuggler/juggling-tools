@@ -11,7 +11,7 @@ interface ThrowsParams {
   max_height: number;
 }
 
-export const throwsQueries = {
+const throwsQueries = {
   all: () => ["throws"] as const,
   gets: () => [...throwsQueries.all(), "get"] as const,
   get: (params: ThrowsParams) =>

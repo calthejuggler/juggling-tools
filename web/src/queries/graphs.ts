@@ -7,7 +7,7 @@ import type { GraphsValues } from "@/lib/schemas";
 
 import { m } from "@/paraglide/messages.js";
 
-export const graphQueries = {
+const graphQueries = {
   all: () => ["graphs"] as const,
   gets: () => [...graphQueries.all(), "get"] as const,
   get: (params: GraphsValues) =>

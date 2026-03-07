@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api";
 
 import { m } from "@/paraglide/messages.js";
 
-export const configQueries = {
+const configQueries = {
   all: () => ["config"] as const,
   gets: () => [...configQueries.all(), "get"] as const,
   get: () =>

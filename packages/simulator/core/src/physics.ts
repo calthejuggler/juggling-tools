@@ -13,7 +13,7 @@ export type BallPosition = {
   readonly color: string;
 };
 
-export type PhysicsConfig = {
+type PhysicsConfig = {
   readonly beatDuration: number;
   readonly dwellRatio: number;
   readonly arcSkewExponent: number;

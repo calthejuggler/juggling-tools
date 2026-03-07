@@ -25,7 +25,7 @@ export type HandsConfig = {
 };
 
 /** Props for the {@link Hand} component. */
-export type HandProps = {
+type HandProps = {
   /** Optional custom render function. When provided, replaces the default semi-circle drawing for this hand. */
   children?: HandRenderFn;
 };
@@ -42,7 +42,7 @@ export type HandProps = {
 export const Hand: FC<HandProps> = () => null;
 
 /** Props for the {@link Hands} component. */
-export type HandsProps = {
+type HandsProps = {
   /** Number of hands in the simulation. @defaultValue 2 */
   count?: number;
   /** Optional `<Hand>` children for per-hand custom rendering. */

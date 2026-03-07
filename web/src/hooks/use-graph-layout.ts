@@ -6,13 +6,13 @@ import GraphLayoutWorker from "@/workers/graph-layout.worker?worker";
 
 import { m } from "@/paraglide/messages.js";
 
-export interface GraphLayout {
+interface GraphLayout {
   nodes: GraphNode[];
   edges: GraphEdge[];
   simplified: boolean;
 }
 
-export interface LayoutProgress {
+interface LayoutProgress {
   phase: LayoutPhase;
   phaseIndex: number;
   totalPhases: number;

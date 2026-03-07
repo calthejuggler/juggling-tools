@@ -25,6 +25,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p web/tsconfig.app.json",
+    "knip": "knip",
     "build:simulator": "bun run --filter '@juggling-tools/simulator' build",
     "build:simulator-react": "bun run build:simulator && bun run --filter '@juggling-tools/simulator-react' build",
     "prepare": "lefthook install"
@@ -37,9 +38,11 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "eslint-plugin-react-hooks": "7.0.1",
+    "knip": "^5.86.0",
     "lefthook": "^2.1.2",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
   }
 }

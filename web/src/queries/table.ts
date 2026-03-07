@@ -7,7 +7,7 @@ import type { TableApiResponse } from "@/lib/table-types";
 
 import { m } from "@/paraglide/messages.js";
 
-export const tableQueries = {
+const tableQueries = {
   all: () => ["table"] as const,
   gets: () => [...tableQueries.all(), "get"] as const,
   get: (params: GraphsValues) =>

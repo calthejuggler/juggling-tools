@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 import type { Simulator } from "@juggling-tools/simulator";
 
 /** Internal context value shared between simulator components. */
-export type SimulatorContextValue = {
+type SimulatorContextValue = {
   /** The underlying core simulator instance, or `null` before the canvas is registered. */
   readonly simulator: Simulator | null;
   /** Callback to register a canvas element with the simulator. Called by `<Canvas>`. */

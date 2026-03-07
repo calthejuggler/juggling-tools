@@ -22,7 +22,7 @@ export type JugglerConfig = {
 };
 
 /** Props for the {@link Juggler} component. */
-export type JugglerProps = {
+type JugglerProps = {
   /** Optional custom render function. When provided, replaces the default stick-figure drawing. */
   children?: JugglerRenderFn;
 };

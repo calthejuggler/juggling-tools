@@ -1,6 +1,6 @@
 type BaseFields = Record<string, unknown>;
 
-export function createLogger(baseFields?: BaseFields) {
+const createLogger = (baseFields?: BaseFields) => {
   const base: BaseFields = {
     service: "server",
     version: Bun.env.npm_package_version ?? "unknown",
@@ -29,6 +29,6 @@ export function createLogger(baseFields?: BaseFields) {
       process.stderr.write(line + "\n");
     },
   };
-}
+};
 
 export const logger = createLogger();

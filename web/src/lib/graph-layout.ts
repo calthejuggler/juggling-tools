@@ -3,8 +3,8 @@ import dagre from "dagre";
 import { toAbbreviatedLabel, toBinaryLabel } from "./binary-label";
 import type { ExpandedGraphResponse, GraphApiResponse, GraphEdge, GraphNode } from "./graph-types";
 
-export const NODE_WIDTH = 120;
-export const NODE_HEIGHT = 40;
+const NODE_WIDTH = 120;
+const NODE_HEIGHT = 40;
 export const SIMPLIFIED_THRESHOLD = 200;
 
 export function expandCompactResponse(

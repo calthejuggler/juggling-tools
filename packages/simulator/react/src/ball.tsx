@@ -23,7 +23,7 @@ export type BallConfig = {
 };
 
 /** Props for the {@link Ball} component. */
-export type BallProps = {
+type BallProps = {
   /** CSS color string for this ball. */
   color: string;
   /** Optional custom render function. When provided, replaces the default filled-circle drawing for this ball. */
