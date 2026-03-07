@@ -3,6 +3,11 @@ name: Release (npm)
 on:
   push:
     branches: [main]
+    paths:
+      - ".changeset/**"
+      - "packages/**"
+      - "package.json"
+      - "bun.lock"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -3,6 +3,10 @@ name: Release (crate)
 on:
   push:
     branches: [main]
+    paths:
+      - "engine/crates/juggling-tools/**"
+      - "engine/Cargo.toml"
+      - "engine/Cargo.lock"
   pull_request:
     branches: [main]
     types: [closed]

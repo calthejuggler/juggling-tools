@@ -3,6 +3,16 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - ".changeset/**"
+      - ".github/**"
+      - ".editorconfig"
+      - ".gitignore"
+      - ".prettierrc"
+      - "lefthook.yml"
+      - "knip.json"
+      - "LICENSE"
   pull_request:
     branches: [main]
 
