@@ -67,6 +67,7 @@
   "builder_choose_prompt": "Choose throws to build a pattern.",
   "builder_loop_back": "← loop",
   "builder_siteswap": "Siteswap",
+  "builder_simulator_placeholder": "Choose throws to preview the animation",
 
   "table_failed_to_load": "Failed to load table",
   "table_loading": "Loading table...",

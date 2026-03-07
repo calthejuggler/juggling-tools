@@ -13,6 +13,7 @@ import { UI_MAX_HEIGHT } from "@/lib/schemas";
 import { useThrowsQuery } from "@/queries/throws";
 
 import { BuilderGraphPanel } from "./builder-graph-panel";
+import { BuilderSimulatorPanel } from "./builder-simulator-panel";
 import { PatternSequence } from "./pattern-sequence";
 import { ThrowPicker } from "./throw-picker";
 
@@ -155,11 +156,18 @@ export function BuilderCanvas({ form, onFieldChange, numProps, maxHeight }: Buil
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <Card className="order-2 h-[300px] md:order-1 md:h-auto md:min-h-0 md:flex-1 md:shadow-lg">
-          <CardContent className="h-full p-0">
-            <BuilderGraphPanel state={state} maxHeight={maxHeight} numProps={numProps} />
-          </CardContent>
-        </Card>
+        <div className="order-2 flex flex-col gap-4 md:order-1 md:min-h-0 md:flex-1 md:flex-row">
+          <Card className="h-[300px] md:h-auto md:min-h-0 md:flex-1 md:shadow-lg">
+            <CardContent className="h-full p-0">
+              <BuilderGraphPanel state={state} maxHeight={maxHeight} numProps={numProps} />
+            </CardContent>
+          </Card>
+          <Card className="h-[300px] md:h-auto md:min-h-0 md:w-64 md:shadow-lg">
+            <CardContent className="h-full p-0">
+              <BuilderSimulatorPanel state={state} numProps={numProps} />
+            </CardContent>
+          </Card>
+        </div>
 
         {data ? (
           <Card className="order-1 shrink-0 md:order-2 md:shadow-lg">

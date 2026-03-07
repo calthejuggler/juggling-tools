@@ -67,6 +67,7 @@
   "builder_choose_prompt": "选择抛出来构建一个花式。",
   "builder_loop_back": "← 循环",
   "builder_siteswap": "Siteswap",
+  "builder_simulator_placeholder": "选择抛出来预览动画",
 
   "table_failed_to_load": "加载表格失败",
   "table_loading": "加载表格...",

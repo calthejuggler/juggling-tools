@@ -67,6 +67,7 @@
   "builder_choose_prompt": "Wähle Würfe, um ein Muster zu erstellen.",
   "builder_loop_back": "← Schleife",
   "builder_siteswap": "Siteswap",
+  "builder_simulator_placeholder": "Wähle Würfe, um die Animation anzuzeigen",
 
   "table_failed_to_load": "Tabelle konnte nicht geladen werden",
   "table_loading": "Tabelle wird geladen...",

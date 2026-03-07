@@ -67,6 +67,7 @@
   "builder_choose_prompt": "Elige lanzamientos para construir un patrón.",
   "builder_loop_back": "← bucle",
   "builder_siteswap": "Siteswap",
+  "builder_simulator_placeholder": "Elige lanzamientos para previsualizar la animación",
 
   "table_failed_to_load": "Error al cargar la tabla",
   "table_loading": "Cargando tabla...",

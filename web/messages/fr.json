@@ -67,6 +67,7 @@
   "builder_choose_prompt": "Choisissez des lancers pour construire un pattern.",
   "builder_loop_back": "← boucle",
   "builder_siteswap": "Siteswap",
+  "builder_simulator_placeholder": "Choisissez des lancers pour prévisualiser l'animation",
 
   "table_failed_to_load": "Échec du chargement du tableau",
   "table_loading": "Chargement du tableau...",
