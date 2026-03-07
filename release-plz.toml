@@ -1,0 +1,9 @@
+[workspace]
+release = false
+changelog_update = false
+
+[[package]]
+name = "juggling-tools"
+release = true
+changelog_update = true
+git_tag_name = "juggling-tools-v{{ version }}"
